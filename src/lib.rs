@@ -17,7 +17,7 @@ pub use crate::engines::aws::RoleData;
 #[cfg(test)]
 mod tests {
     use crate::client::VaultClient;
-    const POLICY: &str = "path \"aws/sts/openshift-exchange-api\" { capabilities = [\"read\", \"list\"] }";
+    const POLICY: &str = "path \"aws/sts/test\" { capabilities = [\"read\", \"list\"] }";
 
     #[test]
     fn init() {
