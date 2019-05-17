@@ -38,7 +38,7 @@ impl VaultClient {
         Ok(Url::parse(&format!("{}/v1/{}/roles", path.unwrap_or(AWS_DEFAULT_PATH), self.endpoint))?)
     }
 
-    pub fn create_assumed_role(&self, path: Option<&str>, name: &str, data: &RoleData) -> Result<()> {
+    pub fn create_aws_role(&self, path: Option<&str>, name: &str, data: &RoleData) -> Result<()> {
         let rsp = self.http_client
             .post(self.aws_url(path, name)?)
             .json(data)
@@ -55,10 +55,10 @@ impl VaultClient {
     }
 
     pub fn read_aws_role(&self, path: Option<&str>, role: &str) -> Result<RoleData> {
-        let data: RoleData = self.http_client.get(self.aws_url(path, role)?)
+        let rsp: ReadRoleResponse = self.http_client.get(self.aws_url(path, role)?)
             .send()?
             .error_for_status()?
             .json()?;
-        Ok(data)
+        Ok(rsp.data)
     }
 }

@@ -11,6 +11,9 @@ mod client;
 mod policy;
 mod engines;
 
+pub use crate::client::VaultClient;
+pub use crate::engines::aws::RoleData;
+
 #[cfg(test)]
 mod tests {
     use crate::client::VaultClient;
