@@ -9,6 +9,10 @@ extern crate reqwest;
 mod error;
 mod client;
 mod policy;
+mod engines;
+
+pub use crate::client::VaultClient;
+pub use crate::engines::aws::RoleData;
 
 #[cfg(test)]
 mod tests {
@@ -68,6 +72,11 @@ mod tests {
                 assert_eq!(0, 1);
                 ()
             });
+        assert_eq!(1, 1);
+    }
+
+    #[test]
+    fn role_data() {
         assert_eq!(1, 1);
     }
 }

@@ -4,6 +4,13 @@ version = "0.0.1"
 authors = ["Liber Wang <liberwang1013@gmail.com>"]
 edition = "2018"
 
+[lib]
+name = "vault"
+path = "src/lib.rs"
+
+[workspace]
+members = ["example"]
+
 [dev-dependencies]
 env_logger = "0.6.1"
 
