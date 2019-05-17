@@ -13,6 +13,7 @@ mod engines;
 
 pub use crate::client::VaultClient;
 pub use crate::engines::aws::RoleData;
+pub use crate::engines::kv_v2::KVData;
 
 #[cfg(test)]
 mod tests {
