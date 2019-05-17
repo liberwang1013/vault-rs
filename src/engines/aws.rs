@@ -22,38 +22,40 @@ pub struct RoleData {
     pub default_sts_ttl: i32,
 }
 
+const AWS_DEFAULT_PATH: &str = "aws";
+
 #[derive(Deserialize)]
 struct ReadRoleResponse {
     data: RoleData
 }
 
 impl VaultClient {
-    fn aws_url(&self, role: &str) -> Result<Url> {
-        Ok(Url::parse(&format!("{}/v1/aws/roles/{}", self.endpoint, role))?)
+    fn aws_url(&self, path: Option<&str>, role: &str) -> Result<Url> {
+        Ok(Url::parse(&format!("{}/v1/{}/roles/{}", self.endpoint, path.unwrap_or(AWS_DEFAULT_PATH), role))?)
     }
 
-    fn list_url(&self) -> Result<Url> {
-        Ok(Url::parse(&format!("{}/v1/aws/roles", self.endpoint))?)
+    fn list_url(&self, path: Option<&str>) -> Result<Url> {
+        Ok(Url::parse(&format!("{}/v1/{}/roles", path.unwrap_or(AWS_DEFAULT_PATH), self.endpoint))?)
     }
 
-    pub fn create_assumed_role(&self, name: &str, data: &RoleData) -> Result<()> {
+    pub fn create_assumed_role(&self, path: Option<&str>, name: &str, data: &RoleData) -> Result<()> {
         let rsp = self.http_client
-            .post(self.aws_url(name)?)
+            .post(self.aws_url(path, name)?)
             .json(data)
             .send()?
             .error_for_status()?;
         Ok(())
     }
 
-    pub fn delete_aws_role(&self, role: &str) -> Result<()> {
-        let rsp = self.http_client.delete(self.aws_url(role)?)
+    pub fn delete_aws_role(&self, path: Option<&str>, role: &str) -> Result<()> {
+        let rsp = self.http_client.delete(self.aws_url(path, role)?)
             .send()?
             .error_for_status()?;
         Ok(())
     }
 
-    pub fn read_aws_role(&self, role: &str) -> Result<RoleData> {
-        let data: RoleData = self.http_client.get(self.aws_url(role)?)
+    pub fn read_aws_role(&self, path: Option<&str>, role: &str) -> Result<RoleData> {
+        let data: RoleData = self.http_client.get(self.aws_url(path, role)?)
             .send()?
             .error_for_status()?
             .json()?;
