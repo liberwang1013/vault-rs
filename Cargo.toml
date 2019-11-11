@@ -8,16 +8,19 @@ edition = "2018"
 name = "vault"
 path = "src/lib.rs"
 
-[workspace]
-members = ["example"]
-
 [dev-dependencies]
 env_logger = "0.6.1"
+tokio = "0.2.0-alpha.6"
 
 [dependencies]
 log = "0.4"
-reqwest = "0.9.15"
+url = "^2.1"
+futures = "0.3.0"
+#tokio = "0.2.0-alpha.6"
+
+reqwest = {version = "0.10.0-alpha.1", features = ["json"]}
 http = "0.1.17"
+
 serde = {version = "1.0.90", features = ["derive"]}
 serde_json = "1.0.39"
 

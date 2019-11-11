@@ -1,7 +1,7 @@
 error_chain!{
     foreign_links {
         ReqwestError(reqwest::Error);
-        RequestUrlError(reqwest::UrlError);
+        //ParseUrlError(reqwest::ParseError);
         IoError(std::io::Error);
         EnvError(std::env::VarError);
         InvalidMethodError(http::method::InvalidMethod);
