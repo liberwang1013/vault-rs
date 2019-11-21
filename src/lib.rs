@@ -1,14 +1,16 @@
-#[macro_use] extern crate error_chain;
+#[macro_use]
+extern crate error_chain;
 
-#[macro_use] extern crate serde;
+#[macro_use]
+extern crate serde;
 //#[macro_use] extern crate log;
 extern crate serde_json;
 
 extern crate reqwest;
 
-pub mod error;
 mod client;
 pub mod engines;
+pub mod error;
 
 pub use crate::client::VaultClient;
 //pub use crate::engines::aws::RoleData;
@@ -23,7 +25,6 @@ mod tests {
         env_logger::init();
         assert_eq!(1, 1);
     }
-
 
     #[test]
     fn role_data() {

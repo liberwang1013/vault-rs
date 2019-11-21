@@ -1,4 +1,4 @@
-error_chain!{
+error_chain! {
     foreign_links {
         ReqwestError(reqwest::Error);
         //ParseUrlError(reqwest::ParseError);

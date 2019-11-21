@@ -9,5 +9,5 @@ struct ResponseMetadata {
     lease_duration: i32,
     wrap_info: Option<String>,
     warnings: Option<String>,
-    auth: Option<String>
+    auth: Option<String>,
 }

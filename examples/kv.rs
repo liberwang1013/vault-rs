@@ -1,8 +1,9 @@
-#[macro_use] extern crate log;
+#[macro_use]
+extern crate log;
 use tokio::runtime::Runtime;
 use vault::VaultClient;
 //use vault::error::*;
-use vault::engines::kv2::{PutKV2Request, Kv2Config};
+use vault::engines::kv2::{Kv2Config, PutKV2Request};
 
 use std::collections::HashMap;
 
@@ -25,7 +26,6 @@ fn main() {
     let fut = client.get_kv(Some("kv"), "secret", None);
     let rsp = rt.block_on(fut);
     info!("rsp is {:?}", rsp);
-
 
     let config_data = Kv2Config {
         max_versions: Some(7),
