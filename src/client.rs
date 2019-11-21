@@ -1,11 +1,8 @@
 use std::env;
-//use std::fs::File;
-//use std::io::prelude::*;
-
 use crate::error::*;
+use serde::{Serialize, de::DeserializeOwned};
 
 const VAULT_TOKEN_HEADER: &str = "X-VAULT-TOKEN";
-
 const VAULT_ADDR: &str = "VAULT_ADDR";
 const VAULT_TOKEN: &str = "VAULT_TOKEN";
 
@@ -27,6 +24,17 @@ impl VaultClient {
 
         let client = reqwest::Client::builder().default_headers(default_header).build()?;
 
-        Ok(VaultClient{endpoint: addr, http_client: client})
+        Ok(VaultClient{endpoint: format!("{}/v1",  addr), http_client: client})
+    }
+
+    pub async fn post<R, D>(&self, key: &str, data: R) -> reqwest::Result<D>
+    where R: Serialize,
+          D: DeserializeOwned
+    {
+        self.http_client
+            .post(&format!("{}/{}", self.endpoint, key))
+            .json(&data)
+            .send().await?
+            .json::<D>().await
     }
 }

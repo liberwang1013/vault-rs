@@ -2,7 +2,7 @@
 use tokio::runtime::Runtime;
 use vault::VaultClient;
 //use vault::error::*;
-use vault::engines::kv_v2::{PutKV2Request, ConfigData};
+use vault::engines::kv2::{PutKV2Request, Kv2Config};
 
 use std::collections::HashMap;
 
@@ -27,7 +27,7 @@ fn main() {
     info!("rsp is {:?}", rsp);
 
 
-    let config_data = ConfigData {
+    let config_data = Kv2Config {
         max_versions: Some(7),
         ..Default::default()
     };
