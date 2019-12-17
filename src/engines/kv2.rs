@@ -1,7 +1,14 @@
 use crate::client::VaultClient;
 use crate::engines::ResponseMetadata;
 use std::collections::HashMap;
+use crate::response::VaultData;
 
+use futures_util::TryFutureExt;
+use futures_core::TryFuture;
+use futures_util::future::AndThen;
+use reqwest::Response;
+use reqwest::StatusCode;
+use std::future::Future;
 const DEFAULT_PATH_KV2: &str = "secret";
 
 #[derive(Deserialize, Serialize, Default, Debug)]
@@ -46,75 +53,26 @@ pub struct UndeleteKv2VersionsRequest {
     pub versions: Vec<i32>,
 }
 
-#[derive(Deserialize, Debug)]
-pub struct PutKv2Response {
-    pub data: Kv2Metadata,
-}
-
-#[derive(Deserialize, Debug)]
-pub struct GetKv2Response {
-    #[serde(flatten)]
-    meta: ResponseMetadata,
-    pub data: Kv2Data,
-}
-
-#[derive(Deserialize, Debug)]
-pub struct ReadKv2ConfigResponse {
-    #[serde(flatten)]
-    meta: ResponseMetadata,
-    pub data: Kv2Config,
-}
 
 impl VaultClient {
-    fn data_url(&self, path: Option<&str>, kv: &str, version: Option<i32>) -> String {
-        match version {
-            Some(v) => format!(
-                "{}/{}/data/{}?version={}",
-                self.endpoint,
-                path.unwrap_or(DEFAULT_PATH_KV2),
-                kv,
-                v
-            ),
-            None => format!(
-                "{}/{}/data/{}",
-                self.endpoint,
-                path.unwrap_or(DEFAULT_PATH_KV2),
-                kv
-            ),
-        }
-    }
 
     pub async fn put_config(
         &self,
         mount: Option<&str>,
         data: &Kv2Config,
-    ) -> reqwest::Result<reqwest::StatusCode> {
-        Ok(self
-            .http_client
-            .post(&format!(
-                "{}/{}/config",
-                self.endpoint,
-                mount.unwrap_or(DEFAULT_PATH_KV2)
-            ))
-            .json(data)
-            .send()
-            .await?
-            .status())
+    ) -> crate::error::Result<StatusCode> {
+        self.post(&format!("{}/config", mount.unwrap_or(DEFAULT_PATH_KV2)), data)
+            .await
+            .and_then(|rsp| {Ok(rsp.status())})
     }
 
     pub async fn get_config(
         &self,
         mount: Option<&str>,
-    ) -> reqwest::Result<ReadKv2ConfigResponse> {
-        self.http_client
-            .get(&format!(
-                "{}/{}/config",
-                self.endpoint,
-                mount.unwrap_or(DEFAULT_PATH_KV2)
-            ))
-            .send()
+    ) -> crate::error::Result<VaultData<Kv2Config>> {
+        self.get(&format!("{}/config", mount.unwrap_or(DEFAULT_PATH_KV2)))
             .await?
-            .json::<ReadKv2ConfigResponse>()
+            .parse::<VaultData<Kv2Config>>()
             .await
     }
 
@@ -123,13 +81,10 @@ impl VaultClient {
         mount: Option<&str>,
         kv: &str,
         data: &PutKv2Request,
-    ) -> reqwest::Result<PutKv2Response> {
-        self.http_client
-            .post(self.data_url(mount, kv, None).as_str())
-            .json(data)
-            .send()
+    ) -> crate::error::Result<VaultData<Kv2Metadata>> {
+        self.post(&format!("{}/data/{}", mount.unwrap_or(DEFAULT_PATH_KV2), kv), data)
             .await?
-            .json::<PutKv2Response>()
+            .parse::<VaultData<Kv2Metadata>>()
             .await
     }
 
@@ -137,14 +92,22 @@ impl VaultClient {
         &self,
         mount: Option<&str>,
         kv: &str,
-        version: Option<i32>,
-    ) -> reqwest::Result<GetKv2Response> {
-        self.http_client
-            .get(self.data_url(mount, kv, version).as_str())
-            .query(&[("version", version)])
-            .send()
+    ) -> crate::error::Result<VaultData<Kv2Data>> {
+        self.get(&format!("{}/data/{}", mount.unwrap_or(DEFAULT_PATH_KV2), kv))
             .await?
-            .json::<GetKv2Response>()
+            .parse::<VaultData<Kv2Data>>()
+            .await
+    }
+
+    pub async fn get_kv_with_version(
+        &self,
+        mount: Option<&str>,
+        kv: &str,
+        version: i32,
+    ) -> crate::error::Result<VaultData<Kv2Data>> {
+        self.get_with_query(&format!("{}/data/{}", mount.unwrap_or(DEFAULT_PATH_KV2), kv), &[("version", version)])
+            .await?
+            .parse::<VaultData<Kv2Data>>()
             .await
     }
 

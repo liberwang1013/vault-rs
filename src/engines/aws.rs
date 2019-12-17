@@ -16,6 +16,19 @@ pub struct AwsCredential {
     pub security_token: String,
 }
 
+/*
+impl crate::response::FromVaultResponse for AwsCredential {
+    fn from_vault_response(rsp: &crate::response::VaultResponse) -> reqwest::Result<Self> {
+        Ok()
+        AwsCredential{
+            access_key: String::from("ak"),
+            secret_key: String::from("sk"),
+            security_token: String::from("st")
+        }
+    }
+}
+ */
+
 #[derive(Deserialize)]
 pub struct GetRootConfigResponse {
     pub data: AwsRootConfig,

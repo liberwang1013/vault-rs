@@ -3,7 +3,7 @@ extern crate log;
 use tokio::runtime::Runtime;
 use vault::VaultClient;
 //use vault::error::*;
-use vault::engines::kv2::{Kv2Config, PutKV2Request};
+use vault::engines::kv2::{Kv2Config, PutKv2Request};
 
 use std::collections::HashMap;
 
@@ -12,10 +12,9 @@ fn main() {
     info!("test");
     let rt = Runtime::new().unwrap();
     let client = VaultClient::new().unwrap();
-
     let mut data = HashMap::<String, String>::new();
     data.insert(String::from("key"), String::from("value"));
-    let req = PutKV2Request {
+    let req = PutKv2Request {
         data: data,
         ..Default::default()
     };
@@ -23,7 +22,7 @@ fn main() {
     let create_rsp = rt.block_on(create_fut);
     info!("create rsp is {:?}", create_rsp);
 
-    let fut = client.get_kv(Some("kv"), "secret", None);
+    let fut = client.get_kv(Some("kv"), "secret");
     let rsp = rt.block_on(fut);
     info!("rsp is {:?}", rsp);
 
