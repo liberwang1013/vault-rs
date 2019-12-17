@@ -1,6 +1,4 @@
 use crate::client::VaultClient;
-use crate::engines::ResponseMetadata;
-
 use crate::response::VaultData;
 
 #[derive(Deserialize, Serialize)]
@@ -32,10 +30,13 @@ impl VaultClient {
         &self,
         mount: Option<&str>,
     ) -> crate::error::Result<VaultData<AwsRootConfig>> {
-        self.get(&format!("{}/config/root", mount.unwrap_or(DEFAULT_PATH_AWS)))
-            .await?
-            .parse::<VaultData<AwsRootConfig>>()
-            .await
+        self.get(&format!(
+            "{}/config/root",
+            mount.unwrap_or(DEFAULT_PATH_AWS)
+        ))
+        .await?
+        .parse::<VaultData<AwsRootConfig>>()
+        .await
     }
 
     pub async fn put_aws_root_config(
@@ -43,23 +44,27 @@ impl VaultClient {
         mount: Option<&str>,
         config: AwsRootConfig,
     ) -> crate::error::Result<reqwest::StatusCode> {
-        self.post(&format!("{}/config/root", mount.unwrap_or(DEFAULT_PATH_AWS)), config)
-            .await
-            .and_then(|rsp| {Ok(rsp.status())})
+        self.post(
+            &format!("{}/config/root", mount.unwrap_or(DEFAULT_PATH_AWS)),
+            config,
+        )
+        .await
+        .and_then(|rsp| Ok(rsp.status()))
     }
 
     pub async fn get_role(
         &self,
         mount: Option<&str>,
-        role: &str) -> crate::error::Result<VaultData<AwsRole>> {
+        role: &str,
+    ) -> crate::error::Result<VaultData<AwsRole>> {
         self.get(&format!(
             "{}/roles/{}",
             mount.unwrap_or(DEFAULT_PATH_AWS),
             role
         ))
-            .await?
-            .parse::<VaultData<AwsRole>>()
-            .await
+        .await?
+        .parse::<VaultData<AwsRole>>()
+        .await
     }
 
     pub async fn generate_sts_credentials(
@@ -68,12 +73,12 @@ impl VaultClient {
         role: &str,
     ) -> crate::error::Result<VaultData<AwsCredential>> {
         self.get(&format!(
-                "{}/sts/{}",
-                mount.unwrap_or(DEFAULT_PATH_AWS),
-                role
-            ))
-            .await?
-            .parse::<VaultData<AwsCredential>>()
-            .await
+            "{}/sts/{}",
+            mount.unwrap_or(DEFAULT_PATH_AWS),
+            role
+        ))
+        .await?
+        .parse::<VaultData<AwsCredential>>()
+        .await
     }
 }

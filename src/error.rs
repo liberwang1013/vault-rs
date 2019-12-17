@@ -1,19 +1,3 @@
-
-/*
-error_chain! {
-    foreign_links {
-        ReqwestError(reqwest::Error);
-        //ParseUrlError(reqwest::ParseError);
-        IoError(std::io::Error);
-        EnvError(std::env::VarError);
-        InvalidMethodError(http::method::InvalidMethod);
-    }
-
-    errors {
-
-    }
-}
-*/
 use std::error::Error as StdError;
 use std::fmt;
 use std::io;
@@ -64,7 +48,6 @@ impl fmt::Debug for Error {
     }
 }
 
-
 impl Error {
     pub(crate) fn new<E>(kind: Kind, source: Option<E>) -> Error
     where
@@ -88,7 +71,6 @@ pub(crate) fn body<E: Into<BoxError>>(e: E) -> Error {
     Error::new(Kind::Body, Some(e))
 }
 
-
 pub(crate) fn decode<E: Into<BoxError>>(e: E) -> Error {
     Error::new(Kind::Decode, Some(e))
 }
@@ -96,4 +78,3 @@ pub(crate) fn decode<E: Into<BoxError>>(e: E) -> Error {
 pub(crate) fn reqwest<E: Into<BoxError>>(e: E) -> Error {
     Error::new(Kind::Reqwest, Some(e))
 }
-

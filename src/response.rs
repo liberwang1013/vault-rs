@@ -21,11 +21,10 @@ struct VaultResponseMetadata {
 pub struct VaultData<T> {
     #[serde(flatten)]
     meta: VaultResponseMetadata,
-    pub data: T
+    pub data: T,
 }
 
 impl VaultResponse {
-
     pub async fn bytes(self) -> reqwest::Result<Bytes> {
         self.0.bytes().await
     }

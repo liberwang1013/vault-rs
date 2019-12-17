@@ -1,14 +1,8 @@
 use crate::client::VaultClient;
-use crate::engines::ResponseMetadata;
-use std::collections::HashMap;
 use crate::response::VaultData;
-
-use futures_util::TryFutureExt;
-use futures_core::TryFuture;
-use futures_util::future::AndThen;
-use reqwest::Response;
+use std::collections::HashMap;
 use reqwest::StatusCode;
-use std::future::Future;
+
 const DEFAULT_PATH_KV2: &str = "secret";
 
 #[derive(Deserialize, Serialize, Default, Debug)]
@@ -53,17 +47,18 @@ pub struct UndeleteKv2VersionsRequest {
     pub versions: Vec<i32>,
 }
 
-
 impl VaultClient {
-
     pub async fn put_config(
         &self,
         mount: Option<&str>,
         data: &Kv2Config,
     ) -> crate::error::Result<StatusCode> {
-        self.post(&format!("{}/config", mount.unwrap_or(DEFAULT_PATH_KV2)), data)
-            .await
-            .and_then(|rsp| {Ok(rsp.status())})
+        self.post(
+            &format!("{}/config", mount.unwrap_or(DEFAULT_PATH_KV2)),
+            data,
+        )
+        .await
+        .and_then(|rsp| Ok(rsp.status()))
     }
 
     pub async fn get_config(
@@ -82,10 +77,13 @@ impl VaultClient {
         kv: &str,
         data: &PutKv2Request,
     ) -> crate::error::Result<VaultData<Kv2Metadata>> {
-        self.post(&format!("{}/data/{}", mount.unwrap_or(DEFAULT_PATH_KV2), kv), data)
-            .await?
-            .parse::<VaultData<Kv2Metadata>>()
-            .await
+        self.post(
+            &format!("{}/data/{}", mount.unwrap_or(DEFAULT_PATH_KV2), kv),
+            data,
+        )
+        .await?
+        .parse::<VaultData<Kv2Metadata>>()
+        .await
     }
 
     pub async fn get_kv(
@@ -93,10 +91,14 @@ impl VaultClient {
         mount: Option<&str>,
         kv: &str,
     ) -> crate::error::Result<VaultData<Kv2Data>> {
-        self.get(&format!("{}/data/{}", mount.unwrap_or(DEFAULT_PATH_KV2), kv))
-            .await?
-            .parse::<VaultData<Kv2Data>>()
-            .await
+        self.get(&format!(
+            "{}/data/{}",
+            mount.unwrap_or(DEFAULT_PATH_KV2),
+            kv
+        ))
+        .await?
+        .parse::<VaultData<Kv2Data>>()
+        .await
     }
 
     pub async fn get_kv_with_version(
@@ -105,10 +107,13 @@ impl VaultClient {
         kv: &str,
         version: i32,
     ) -> crate::error::Result<VaultData<Kv2Data>> {
-        self.get_with_query(&format!("{}/data/{}", mount.unwrap_or(DEFAULT_PATH_KV2), kv), &[("version", version)])
-            .await?
-            .parse::<VaultData<Kv2Data>>()
-            .await
+        self.get_with_query(
+            &format!("{}/data/{}", mount.unwrap_or(DEFAULT_PATH_KV2), kv),
+            &[("version", version)],
+        )
+        .await?
+        .parse::<VaultData<Kv2Data>>()
+        .await
     }
 
     // pub async fn undelete_kv2_versions(&self, mount: Option<&str>, kv: &str, versions: Vec<i32>) -> impl std::future::Future {
