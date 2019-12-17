@@ -1,6 +1,7 @@
 use crate::client::VaultClient;
-use crate::engines::ResponseMetadata;
+use crate::response::VaultData;
 use std::collections::HashMap;
+use reqwest::StatusCode;
 
 const DEFAULT_PATH_KV2: &str = "secret";
 
@@ -46,75 +47,27 @@ pub struct UndeleteKv2VersionsRequest {
     pub versions: Vec<i32>,
 }
 
-#[derive(Deserialize, Debug)]
-pub struct PutKv2Response {
-    pub data: Kv2Metadata,
-}
-
-#[derive(Deserialize, Debug)]
-pub struct GetKv2Response {
-    #[serde(flatten)]
-    meta: ResponseMetadata,
-    pub data: Kv2Data,
-}
-
-#[derive(Deserialize, Debug)]
-pub struct ReadKv2ConfigResponse {
-    #[serde(flatten)]
-    meta: ResponseMetadata,
-    pub data: Kv2Config,
-}
-
 impl VaultClient {
-    fn data_url(&self, path: Option<&str>, kv: &str, version: Option<i32>) -> String {
-        match version {
-            Some(v) => format!(
-                "{}/{}/data/{}?version={}",
-                self.endpoint,
-                path.unwrap_or(DEFAULT_PATH_KV2),
-                kv,
-                v
-            ),
-            None => format!(
-                "{}/{}/data/{}",
-                self.endpoint,
-                path.unwrap_or(DEFAULT_PATH_KV2),
-                kv
-            ),
-        }
-    }
-
     pub async fn put_config(
         &self,
         mount: Option<&str>,
         data: &Kv2Config,
-    ) -> reqwest::Result<reqwest::StatusCode> {
-        Ok(self
-            .http_client
-            .post(&format!(
-                "{}/{}/config",
-                self.endpoint,
-                mount.unwrap_or(DEFAULT_PATH_KV2)
-            ))
-            .json(data)
-            .send()
-            .await?
-            .status())
+    ) -> crate::error::Result<StatusCode> {
+        self.post(
+            &format!("{}/config", mount.unwrap_or(DEFAULT_PATH_KV2)),
+            data,
+        )
+        .await
+        .and_then(|rsp| Ok(rsp.status()))
     }
 
     pub async fn get_config(
         &self,
         mount: Option<&str>,
-    ) -> reqwest::Result<ReadKv2ConfigResponse> {
-        self.http_client
-            .get(&format!(
-                "{}/{}/config",
-                self.endpoint,
-                mount.unwrap_or(DEFAULT_PATH_KV2)
-            ))
-            .send()
+    ) -> crate::error::Result<VaultData<Kv2Config>> {
+        self.get(&format!("{}/config", mount.unwrap_or(DEFAULT_PATH_KV2)))
             .await?
-            .json::<ReadKv2ConfigResponse>()
+            .parse::<VaultData<Kv2Config>>()
             .await
     }
 
@@ -123,29 +76,44 @@ impl VaultClient {
         mount: Option<&str>,
         kv: &str,
         data: &PutKv2Request,
-    ) -> reqwest::Result<PutKv2Response> {
-        self.http_client
-            .post(self.data_url(mount, kv, None).as_str())
-            .json(data)
-            .send()
-            .await?
-            .json::<PutKv2Response>()
-            .await
+    ) -> crate::error::Result<VaultData<Kv2Metadata>> {
+        self.post(
+            &format!("{}/data/{}", mount.unwrap_or(DEFAULT_PATH_KV2), kv),
+            data,
+        )
+        .await?
+        .parse::<VaultData<Kv2Metadata>>()
+        .await
     }
 
     pub async fn get_kv(
         &self,
         mount: Option<&str>,
         kv: &str,
-        version: Option<i32>,
-    ) -> reqwest::Result<GetKv2Response> {
-        self.http_client
-            .get(self.data_url(mount, kv, version).as_str())
-            .query(&[("version", version)])
-            .send()
-            .await?
-            .json::<GetKv2Response>()
-            .await
+    ) -> crate::error::Result<VaultData<Kv2Data>> {
+        self.get(&format!(
+            "{}/data/{}",
+            mount.unwrap_or(DEFAULT_PATH_KV2),
+            kv
+        ))
+        .await?
+        .parse::<VaultData<Kv2Data>>()
+        .await
+    }
+
+    pub async fn get_kv_with_version(
+        &self,
+        mount: Option<&str>,
+        kv: &str,
+        version: i32,
+    ) -> crate::error::Result<VaultData<Kv2Data>> {
+        self.get_with_query(
+            &format!("{}/data/{}", mount.unwrap_or(DEFAULT_PATH_KV2), kv),
+            &[("version", version)],
+        )
+        .await?
+        .parse::<VaultData<Kv2Data>>()
+        .await
     }
 
     // pub async fn undelete_kv2_versions(&self, mount: Option<&str>, kv: &str, versions: Vec<i32>) -> impl std::future::Future {
