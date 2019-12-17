@@ -19,15 +19,11 @@ pub struct AwsCredential {
 }
 
 #[derive(Deserialize)]
-pub struct GetRootConfigResponse {
-    pub data: AwsRootConfig,
-}
-
-#[derive(Deserialize)]
-pub struct GenerateStsCredentialResponse {
-    #[serde(flatten)]
-    meta: ResponseMetadata,
-    pub data: AwsCredential,
+pub struct AwsRole {
+    pub policy_document: String,
+    pub policy_arns: Vec<String>,
+    pub credential_types: Vec<String>,
+    pub role_arns: Vec<String>,
 }
 
 const DEFAULT_PATH_AWS: &str = "aws";
@@ -50,6 +46,20 @@ impl VaultClient {
         self.post(&format!("{}/config/root", mount.unwrap_or(DEFAULT_PATH_AWS)), config)
             .await
             .and_then(|rsp| {Ok(rsp.status())})
+    }
+
+    pub async fn get_role(
+        &self,
+        mount: Option<&str>,
+        role: &str) -> crate::error::Result<VaultData<AwsRole>> {
+        self.get(&format!(
+            "{}/roles/{}",
+            mount.unwrap_or(DEFAULT_PATH_AWS),
+            role
+        ))
+            .await?
+            .parse::<VaultData<AwsRole>>()
+            .await
     }
 
     pub async fn generate_sts_credentials(
