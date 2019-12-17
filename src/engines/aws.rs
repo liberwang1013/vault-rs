@@ -1,6 +1,8 @@
 use crate::client::VaultClient;
 use crate::engines::ResponseMetadata;
 
+use crate::response::VaultData;
+
 #[derive(Deserialize, Serialize)]
 pub struct AwsRootConfig {
     max_retries: i32,
@@ -15,19 +17,6 @@ pub struct AwsCredential {
     pub secret_key: String,
     pub security_token: String,
 }
-
-/*
-impl crate::response::FromVaultResponse for AwsCredential {
-    fn from_vault_response(rsp: &crate::response::VaultResponse) -> reqwest::Result<Self> {
-        Ok()
-        AwsCredential{
-            access_key: String::from("ak"),
-            secret_key: String::from("sk"),
-            security_token: String::from("st")
-        }
-    }
-}
- */
 
 #[derive(Deserialize)]
 pub struct GetRootConfigResponse {
@@ -46,16 +35,10 @@ impl VaultClient {
     pub async fn get_aws_root_config(
         &self,
         mount: Option<&str>,
-    ) -> reqwest::Result<GetRootConfigResponse> {
-        self.http_client
-            .get(&format!(
-                "{}/{}/config/root",
-                self.endpoint,
-                mount.unwrap_or(DEFAULT_PATH_AWS)
-            ))
-            .send()
+    ) -> crate::error::Result<VaultData<AwsRootConfig>> {
+        self.get(&format!("{}/config/root", mount.unwrap_or(DEFAULT_PATH_AWS)))
             .await?
-            .json::<GetRootConfigResponse>()
+            .parse::<VaultData<AwsRootConfig>>()
             .await
     }
 
@@ -63,35 +46,24 @@ impl VaultClient {
         &self,
         mount: Option<&str>,
         config: AwsRootConfig,
-    ) -> reqwest::Result<reqwest::StatusCode> {
-        Ok(self
-            .http_client
-            .post(&format!(
-                "{}/{}/config/root",
-                self.endpoint,
-                mount.unwrap_or(DEFAULT_PATH_AWS)
-            ))
-            .json(&config)
-            .send()
-            .await?
-            .status())
+    ) -> crate::error::Result<reqwest::StatusCode> {
+        self.post(&format!("{}/config/root", mount.unwrap_or(DEFAULT_PATH_AWS)), config)
+            .await
+            .and_then(|rsp| {Ok(rsp.status())})
     }
 
     pub async fn generate_sts_credentials(
         &self,
         mount: Option<&str>,
         role: &str,
-    ) -> reqwest::Result<GenerateStsCredentialResponse> {
-        self.http_client
-            .get(&format!(
-                "{}/{}/sts/{}",
-                self.endpoint,
+    ) -> crate::error::Result<VaultData<AwsCredential>> {
+        self.get(&format!(
+                "{}/sts/{}",
                 mount.unwrap_or(DEFAULT_PATH_AWS),
                 role
             ))
-            .send()
             .await?
-            .json::<GenerateStsCredentialResponse>()
+            .parse::<VaultData<AwsCredential>>()
             .await
     }
 }
