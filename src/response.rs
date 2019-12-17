@@ -1,8 +1,7 @@
-use bytes::Bytes;
 use futures_util::TryFutureExt;
 use serde::de::DeserializeOwned;
 use serde::Deserialize;
-pub struct VaultResponse(pub reqwest::Response);
+pub(crate) struct VaultResponse(pub(crate) reqwest::Response);
 
 use reqwest::StatusCode;
 
@@ -25,7 +24,7 @@ pub struct VaultData<T> {
 }
 
 impl VaultResponse {
-    pub async fn bytes(self) -> reqwest::Result<Bytes> {
+    pub async fn bytes(self) -> reqwest::Result<bytes::Bytes> {
         self.0.bytes().await
     }
 
