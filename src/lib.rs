@@ -10,3 +10,5 @@ pub mod engines;
 pub mod error;
 pub mod response;
 pub use crate::client::VaultClient;
+pub use crate::error::Result;
+pub use crate::response::VaultData;

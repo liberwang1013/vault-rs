@@ -2,7 +2,6 @@
 extern crate log;
 use tokio::runtime::Runtime;
 use vault::VaultClient;
-//use vault::error::*;
 use vault::engines::kv2::{Kv2Config, PutKv2Request};
 
 use std::collections::HashMap;
