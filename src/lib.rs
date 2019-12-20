@@ -6,7 +6,7 @@ extern crate bytes;
 extern crate reqwest;
 
 mod client;
-pub mod engines;
+pub mod secrets;
 pub mod error;
 pub mod response;
 pub use crate::client::VaultClient;
