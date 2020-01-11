@@ -4,7 +4,6 @@ use std::collections::HashMap;
 use reqwest::StatusCode;
 
 const DEFAULT_PATH_KV2: &str = "secret";
-
 #[derive(Deserialize, Serialize, Default, Debug)]
 pub struct Kv2Metadata {
     created_time: String,
@@ -52,7 +51,7 @@ impl VaultClient {
         &self,
         mount: Option<&str>,
         data: &Kv2Config,
-    ) -> crate::error::Result<StatusCode> {
+    ) -> crate::Result<StatusCode> {
         self.post(
             &format!("{}/config", mount.unwrap_or(DEFAULT_PATH_KV2)),
             data,
@@ -64,7 +63,7 @@ impl VaultClient {
     pub async fn get_config(
         &self,
         mount: Option<&str>,
-    ) -> crate::error::Result<VaultData<Kv2Config>> {
+    ) -> crate::Result<VaultData<Kv2Config>> {
         self.get(&format!("{}/config", mount.unwrap_or(DEFAULT_PATH_KV2)))
             .await?
             .parse::<VaultData<Kv2Config>>()
@@ -76,7 +75,7 @@ impl VaultClient {
         mount: Option<&str>,
         kv: &str,
         data: &PutKv2Request,
-    ) -> crate::error::Result<VaultData<Kv2Metadata>> {
+    ) -> crate::Result<VaultData<Kv2Metadata>> {
         self.post(
             &format!("{}/data/{}", mount.unwrap_or(DEFAULT_PATH_KV2), kv),
             data,
@@ -90,7 +89,7 @@ impl VaultClient {
         &self,
         mount: Option<&str>,
         kv: &str,
-    ) -> crate::error::Result<VaultData<Kv2Data>> {
+    ) -> crate::Result<VaultData<Kv2Data>> {
         self.get(&format!(
             "{}/data/{}",
             mount.unwrap_or(DEFAULT_PATH_KV2),
@@ -106,7 +105,7 @@ impl VaultClient {
         mount: Option<&str>,
         kv: &str,
         version: i32,
-    ) -> crate::error::Result<VaultData<Kv2Data>> {
+    ) -> crate::Result<VaultData<Kv2Data>> {
         self.get_with_query(
             &format!("{}/data/{}", mount.unwrap_or(DEFAULT_PATH_KV2), kv),
             &[("version", version)],
@@ -115,12 +114,4 @@ impl VaultClient {
         .parse::<VaultData<Kv2Data>>()
         .await
     }
-
-    // pub async fn undelete_kv2_versions(&self, mount: Option<&str>, kv: &str, versions: Vec<i32>) -> impl std::future::Future {
-    //     let url = format!("{}/{}/undelete/{}", self.endpoint, mount.unwrap_or(VAULT_DEFAULT_MOUNTPATH), kv);
-    //     let req = UndeleteKv2VersionsRequest {
-    //         versions: versions
-    //     };
-    //     self.post(&url, req)
-    // }
 }

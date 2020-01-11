@@ -4,6 +4,7 @@ use serde::Deserialize;
 pub(crate) struct VaultResponse(pub(crate) reqwest::Response);
 
 use reqwest::StatusCode;
+use bytes::Bytes;
 
 #[derive(Deserialize, Serialize, Default, Debug)]
 struct VaultResponseMetadata {
@@ -24,7 +25,7 @@ pub struct VaultData<T> {
 }
 
 impl VaultResponse {
-    pub async fn bytes(self) -> reqwest::Result<bytes::Bytes> {
+    pub async fn bytes(self) -> reqwest::Result<Bytes> {
         self.0.bytes().await
     }
 
