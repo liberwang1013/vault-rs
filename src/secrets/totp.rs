@@ -4,34 +4,66 @@ const DEFAULT_PATH_TOTP: &str = "totp";
 #[derive(Deserialize, Serialize)]
 pub struct TotpKey {
     pub generate: bool,
-    pub exporterd: bool,
-    pub key_size: i32,
-    pub url: String,
-    pub key: String,
-    pub issuer: String,
-    pub account_name: String,
     pub period: i32,
     pub algorithm: String,
     pub digits: i32,
+    #[serde(flatten)]
+    pub role: TotpKeyRole,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum TotpKeyRole {
+    Provider(TotpKeyRoleProvider),
+    Generator(TotpKeyRoleGenerator),
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct TotpKeyRoleProvider {
+    pub url: String,
+    pub key: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct TotpKeyRoleGenerator {
+    pub exporterd: bool,
+    pub key_size: i32,
+    pub issuer: String,
+    pub account_name: String,
     pub skew: i32,
     pub qr_size: i32,
+}
+
+impl Default for TotpKeyRoleProvider {
+    fn default() -> Self {
+        TotpKeyRoleProvider {
+            url: String::from(""),
+            key: String::from(""),
+        }
+    }
+}
+
+impl Default for TotpKeyRoleGenerator {
+    fn default() -> Self {
+        TotpKeyRoleGenerator {
+            exporterd: true,
+            key_size: 20,
+            issuer: String::from(""),
+            account_name: String::from(""),
+            skew: 1,
+            qr_size: 200,
+        }
+    }
 }
 
 impl Default for TotpKey {
     fn default() -> Self {
         TotpKey {
             generate: false,
-            exporterd: true,
-            key_size: 20,
-            url: String::from(""),
-            key: String::from(""),
-            issuer: String::from(""),
-            account_name: String::from(""),
             period: 30,
             algorithm: String::from("SHA1"),
             digits: 6,
-            skew: 1,
-            qr_size: 200,
+            role:  TotpKeyRole::Provider(TotpKeyRoleProvider::default())
         }
     }
 }
