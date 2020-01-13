@@ -1,7 +1,7 @@
 use crate::{VaultClient, VaultData};
 const DEFAULT_PATH_TOTP: &str = "totp";
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct TotpKey {
     pub generate: bool,
     pub period: i32,
@@ -11,20 +11,20 @@ pub struct TotpKey {
     pub role: TotpKeyRole,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(untagged)]
 pub enum TotpKeyRole {
     Provider(TotpKeyRoleProvider),
     Generator(TotpKeyRoleGenerator),
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct TotpKeyRoleProvider {
     pub url: String,
     pub key: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct TotpKeyRoleGenerator {
     pub exporterd: bool,
     pub key_size: i32,
@@ -63,12 +63,12 @@ impl Default for TotpKey {
             period: 30,
             algorithm: String::from("SHA1"),
             digits: 6,
-            role:  TotpKeyRole::Provider(TotpKeyRoleProvider::default())
+            role: TotpKeyRole::Provider(TotpKeyRoleProvider::default()),
         }
     }
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct TotpCode {
     pub code: String,
 }
@@ -79,19 +79,18 @@ pub struct TotpVerifyResult {
 }
 
 impl VaultClient {
-    pub async fn crate_totp_key(
+    pub async fn create_totp_key(
         &self,
         mount: Option<&str>,
         key: &str,
         data: TotpKey,
-    ) -> crate::Result<VaultData<TotpKey>> {
+    ) -> crate::Result<()> {
         self.post(
             &format!("{}/keys/{}", mount.unwrap_or(DEFAULT_PATH_TOTP), key),
             data,
         )
-        .await?
-        .parse::<VaultData<TotpKey>>()
         .await
+        .and_then(|_| Ok(()))
     }
 
     pub async fn read_totp_key(

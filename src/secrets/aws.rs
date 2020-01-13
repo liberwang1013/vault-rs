@@ -18,7 +18,7 @@ pub struct AwsRootConfig {
     sts_endpoint: Option<String>,
 }
 
-fn default_max_retries () -> i32 {
+fn default_max_retries() -> i32 {
     -1
 }
 
@@ -73,7 +73,7 @@ impl VaultClient {
             config,
         )
         .await
-            .and_then(|_| Ok(()))
+        .and_then(|_| Ok(()))
     }
 
     pub async fn get_role(
