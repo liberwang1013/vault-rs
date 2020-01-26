@@ -1,6 +1,7 @@
 use futures_util::TryFutureExt;
 use serde::de::DeserializeOwned;
 use serde::Deserialize;
+use std::collections::HashMap;
 pub(crate) struct VaultResponse(pub(crate) reqwest::Response);
 
 use reqwest::StatusCode;
@@ -12,16 +13,39 @@ struct VaultResponseMetadata {
     lease_id: String,
     renewable: bool,
     lease_duration: i32,
-    wrap_info: Option<String>,
-    warnings: Option<String>,
-    auth: Option<String>,
+    warnings: Option<Vec<String>>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
+pub struct VaultAuth {
+    pub client_token: String,
+    pub accessor: String,
+    pub policies: Vec<String>,
+    pub token_policies: Vec<String>,
+    pub metadata: Option<HashMap<String, String>>,
+    pub orphan: bool,
+    pub entity_id: String,
+    pub lease_duration: i32,
+    pub renewable: bool
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct VaultWrapInfo {
+    pub token: String,
+    pub accessor: String,
+    pub ttl: i32,
+    pub creation_time: String,
+    pub creation_path: String,
+    pub wrapped_accessor: String
+}
+
+#[derive(Deserialize, Serialize, Debug, Default)]
 pub struct VaultData<T> {
     #[serde(flatten)]
     meta: VaultResponseMetadata,
-    pub data: T,
+    pub auth: Option<VaultAuth>,
+    pub wrap_infos: Option<VaultWrapInfo>,
+    pub data: Option<T>,
 }
 
 impl VaultResponse {

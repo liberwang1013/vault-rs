@@ -1,15 +1,15 @@
 #[macro_use]
 extern crate log;
+extern crate serde_json;
 use tokio::runtime::Runtime;
 use vault::VaultClient;
 use vault::secrets::kv2::{Kv2Config, PutKv2Request};
-
 use std::collections::HashMap;
 
 fn main() {
     env_logger::init();
     info!("test");
-    let rt = Runtime::new().unwrap();
+    let mut rt = Runtime::new().unwrap();
     let client = VaultClient::new().unwrap();
     let mut data = HashMap::<String, String>::new();
     data.insert(String::from("key"), String::from("value"));
@@ -19,8 +19,11 @@ fn main() {
     };
     let create_fut = client.put_kv(Some("kv"), "secret", &req);
     let create_rsp = rt.block_on(create_fut);
-    info!("create rsp is {:?}", create_rsp);
+    info!("create rsp is {:?}", &create_rsp);
 
+    if let Ok(rsp) = create_rsp {
+        info!("rsp: {}", serde_json::to_string(&rsp).unwrap());
+    }
     let fut = client.get_kv(Some("kv"), "secret");
     let rsp = rt.block_on(fut);
     info!("rsp is {:?}", rsp);
