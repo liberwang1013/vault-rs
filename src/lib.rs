@@ -13,4 +13,4 @@ pub mod response;
 pub mod secrets;
 pub use crate::client::VaultClient;
 pub use crate::error::Result;
-pub use crate::response::VaultData;
+pub use crate::response::VaultSecret;

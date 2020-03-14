@@ -1,4 +1,4 @@
-use crate::{VaultClient, VaultData};
+use crate::{VaultClient, VaultSecret};
 const DEFAULT_PATH_TOTP: &str = "totp";
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -97,14 +97,14 @@ impl VaultClient {
         &self,
         mount: Option<&str>,
         key: &str,
-    ) -> crate::Result<VaultData<TotpKey>> {
+    ) -> crate::Result<VaultSecret<TotpKey>> {
         self.get(&format!(
             "{}/keys/{}",
             mount.unwrap_or(DEFAULT_PATH_TOTP),
             key
         ))
         .await?
-        .parse::<VaultData<TotpKey>>()
+        .parse::<VaultSecret<TotpKey>>()
         .await
     }
 
@@ -112,14 +112,14 @@ impl VaultClient {
         &self,
         mount: Option<&str>,
         key: &str,
-    ) -> crate::Result<VaultData<TotpCode>> {
+    ) -> crate::Result<VaultSecret<TotpCode>> {
         self.get(&format!(
             "{}/code/{}",
             mount.unwrap_or(DEFAULT_PATH_TOTP),
             key
         ))
         .await?
-        .parse::<VaultData<TotpCode>>()
+        .parse::<VaultSecret<TotpCode>>()
         .await
     }
 
@@ -128,13 +128,13 @@ impl VaultClient {
         mount: Option<&str>,
         key: &str,
         code: TotpCode,
-    ) -> crate::Result<VaultData<TotpVerifyResult>> {
+    ) -> crate::Result<VaultSecret<TotpVerifyResult>> {
         self.post(
             &format!("{}/code/{}", mount.unwrap_or(DEFAULT_PATH_TOTP), key),
             code,
         )
         .await?
-        .parse::<VaultData<TotpVerifyResult>>()
+        .parse::<VaultSecret<TotpVerifyResult>>()
         .await
     }
 }

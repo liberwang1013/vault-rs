@@ -4,11 +4,11 @@ use serde::Deserialize;
 use std::collections::HashMap;
 pub(crate) struct VaultResponse(pub(crate) reqwest::Response);
 
-use reqwest::StatusCode;
 use bytes::Bytes;
+use reqwest::StatusCode;
 
 #[derive(Deserialize, Serialize, Default, Debug)]
-struct VaultResponseMetadata {
+pub struct VaultMetadata {
     request_id: String,
     lease_id: String,
     renewable: bool,
@@ -26,7 +26,7 @@ pub struct VaultAuth {
     pub orphan: bool,
     pub entity_id: String,
     pub lease_duration: i32,
-    pub renewable: bool
+    pub renewable: bool,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -36,13 +36,13 @@ pub struct VaultWrapInfo {
     pub ttl: i32,
     pub creation_time: String,
     pub creation_path: String,
-    pub wrapped_accessor: String
+    pub wrapped_accessor: String,
 }
 
 #[derive(Deserialize, Serialize, Debug, Default)]
-pub struct VaultData<T> {
+pub struct VaultSecret<T> {
     #[serde(flatten)]
-    meta: VaultResponseMetadata,
+    pub meta: VaultMetadata,
     pub auth: Option<VaultAuth>,
     pub wrap_infos: Option<VaultWrapInfo>,
     pub data: Option<T>,

@@ -1,4 +1,4 @@
-use crate::{VaultClient, VaultData};
+use crate::{VaultClient, VaultSecret};
 
 #[derive(Deserialize)]
 pub struct SystemPolicy {
@@ -13,20 +13,20 @@ pub struct SystemPolicyList {
 }
 
 impl VaultClient {
-    pub async fn list_policy(&self) -> crate::Result<VaultData<SystemPolicyList>> {
+    pub async fn list_policy(&self) -> crate::Result<VaultSecret<SystemPolicyList>> {
         self.get("sys/policy")
             .await?
-            .parse::<VaultData<SystemPolicyList>>()
+            .parse::<VaultSecret<SystemPolicyList>>()
             .await
     }
 
     pub async fn get_policy(
         &self,
         name: &str,
-    ) -> crate::Result<VaultData<SystemPolicy>> {
+    ) -> crate::Result<VaultSecret<SystemPolicy>> {
         self.get(&format!("system/policy/{}", name))
             .await?
-            .parse::<VaultData<SystemPolicy>>()
+            .parse::<VaultSecret<SystemPolicy>>()
             .await
     }
 }

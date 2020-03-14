@@ -1,6 +1,7 @@
+use crate::response::VaultResponse;
+use reqwest::RequestBuilder;
 use serde::Serialize;
 use std::env;
-use crate::response::VaultResponse;
 
 const VAULT_TOKEN_HEADER: &str = "X-VAULT-TOKEN";
 const VAULT_ADDR: &str = "VAULT_ADDR";
@@ -49,6 +50,32 @@ impl VaultClient {
     pub(crate) async fn get(&self, key: &str) -> crate::error::Result<VaultResponse> {
         self.http_client
             .get(&format!("{}/{}", self.endpoint, key))
+            .send()
+            .await
+            .and_then(|rsp| Ok(VaultResponse(rsp)))
+            .map_err(crate::error::reqwest)
+    }
+
+    pub(crate) async fn delete<R: Serialize>(
+        &self,
+        key: &str,
+        data: R,
+    ) -> crate::error::Result<VaultResponse> {
+        self.http_client
+            .delete(&format!("{}/{}", self.endpoint, key))
+            .json(&data)
+            .send()
+            .await
+            .and_then(|rsp| Ok(VaultResponse(rsp)))
+            .map_err(crate::error::reqwest)
+    }
+
+    pub(crate) async fn list(&self, key: &str) -> crate::error::Result<VaultResponse> {
+        self.http_client
+            .request(
+                reqwest::Method::from_bytes("LIST".as_bytes()).unwrap(),
+                &format!("{}/{}", self.endpoint, key),
+            )
             .send()
             .await
             .and_then(|rsp| Ok(VaultResponse(rsp)))
