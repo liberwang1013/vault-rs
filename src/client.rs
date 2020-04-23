@@ -1,5 +1,4 @@
 use crate::response::VaultResponse;
-use reqwest::RequestBuilder;
 use serde::Serialize;
 use std::env;
 

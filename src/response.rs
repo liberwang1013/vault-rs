@@ -5,7 +5,6 @@ use std::collections::HashMap;
 pub(crate) struct VaultResponse(pub(crate) reqwest::Response);
 
 use bytes::Bytes;
-use reqwest::StatusCode;
 
 #[derive(Deserialize, Serialize, Default, Debug)]
 pub struct VaultMetadata {
@@ -56,9 +55,5 @@ impl VaultResponse {
     pub async fn parse<T: DeserializeOwned>(self) -> crate::error::Result<T> {
         let full = self.bytes().map_err(crate::error::reqwest).await?;
         serde_json::from_slice(&full).map_err(crate::error::decode)
-    }
-
-    pub fn status(&self) -> StatusCode {
-        self.0.status()
     }
 }

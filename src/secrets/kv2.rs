@@ -29,7 +29,6 @@ pub struct Kv2Data {
     metadata: VaultKv2Metadata,
 }
 
-type KeyList = Vec<String>;
 #[derive(Deserialize, Serialize, Default, Debug)]
 pub struct Kv2KeyList {
     keys: Vec<String>,

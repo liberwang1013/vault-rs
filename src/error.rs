@@ -1,8 +1,7 @@
 use std::error::Error as StdError;
 use std::fmt;
-use std::io;
 
-use reqwest::{StatusCode, Url};
+use reqwest::{Url};
 
 /// A `Result` alias where the `Err` case is "vault::Error`.
 pub type Result<T> = std::result::Result<T, Error>;
@@ -17,10 +16,6 @@ pub(crate) type BoxError = Box<dyn StdError + Send + Sync>;
 #[derive(Debug)]
 pub(crate) enum Kind {
     Builder,
-    Request,
-    Redirect,
-    Status(StatusCode),
-    Body,
     Decode,
     Reqwest,
 }
@@ -65,10 +60,6 @@ impl Error {
 
 pub(crate) fn builder<E: Into<BoxError>>(e: E) -> Error {
     Error::new(Kind::Builder, Some(e))
-}
-
-pub(crate) fn body<E: Into<BoxError>>(e: E) -> Error {
-    Error::new(Kind::Body, Some(e))
 }
 
 pub(crate) fn decode<E: Into<BoxError>>(e: E) -> Error {
