@@ -219,4 +219,32 @@ impl Client {
         .parse::<Secret<KV2Metadata>>()
         .await
     }
+
+    pub async fn put_kv_metadata(
+        &self,
+        mount: Option<&str>,
+        path: &str,
+        data: &KV2Config,
+    ) -> crate::Result<()> {
+        self.post(
+            &format!("{}/metadata/{}", mount.unwrap_or(DEFAULT_PATH_KV2), path),
+            data,
+        )
+        .await
+        .and_then(|_| Ok(()))
+    }
+
+    pub async fn desstroy_kv(
+        &self,
+        mount: Option<&str>,
+        path: &str,
+    ) -> crate::Result<()> {
+        self.delete(&format!(
+            "{}/metedata/{}",
+            mount.unwrap_or(DEFAULT_PATH_KV2),
+            path
+        ))
+        .await
+        .and_then(|_| Ok(()))
+    }
 }
