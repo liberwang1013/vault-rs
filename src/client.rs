@@ -1,4 +1,4 @@
-use crate::response::VaultResponse;
+use crate::response::Response;
 use serde::Serialize;
 use std::env;
 
@@ -7,13 +7,13 @@ const VAULT_ADDR: &str = "VAULT_ADDR";
 const VAULT_TOKEN: &str = "VAULT_TOKEN";
 const DEFAULT_VAULT_ADDR: &str = "http://127.0.0.1:8200";
 
-pub struct VaultClient {
+pub struct Client {
     pub endpoint: String,
     pub http_client: reqwest::Client,
 }
 
-impl VaultClient {
-    pub fn new() -> crate::error::Result<VaultClient> {
+impl Client {
+    pub fn new() -> crate::error::Result<Client> {
         let addr =
             env::var(VAULT_ADDR).unwrap_or_else(|_| String::from(DEFAULT_VAULT_ADDR));
         let token = env::var(VAULT_TOKEN).map_err(crate::error::builder)?;
@@ -26,7 +26,7 @@ impl VaultClient {
             .build()
             .map_err(crate::error::builder)?;
 
-        Ok(VaultClient {
+        Ok(Client {
             endpoint: format!("{}/v1", addr),
             http_client: client,
         })
@@ -36,40 +36,38 @@ impl VaultClient {
         &self,
         key: &str,
         data: R,
-    ) -> crate::error::Result<VaultResponse> {
+    ) -> crate::error::Result<Response> {
         self.http_client
             .post(&format!("{}/{}", self.endpoint, key))
             .json(&data)
             .send()
             .await
-            .and_then(|rsp| Ok(VaultResponse(rsp)))
+            .and_then(|rsp| Ok(Response(rsp)))
             .map_err(crate::error::reqwest)
     }
 
-    pub(crate) async fn get(&self, key: &str) -> crate::error::Result<VaultResponse> {
+    pub(crate) async fn get(&self, key: &str) -> crate::error::Result<Response> {
         self.http_client
             .get(&format!("{}/{}", self.endpoint, key))
             .send()
             .await
-            .and_then(|rsp| Ok(VaultResponse(rsp)))
+            .and_then(|rsp| Ok(Response(rsp)))
             .map_err(crate::error::reqwest)
     }
 
-    pub(crate) async fn delete<R: Serialize>(
+    pub(crate) async fn delete(
         &self,
         key: &str,
-        data: R,
-    ) -> crate::error::Result<VaultResponse> {
+    ) -> crate::error::Result<Response> {
         self.http_client
             .delete(&format!("{}/{}", self.endpoint, key))
-            .json(&data)
             .send()
             .await
-            .and_then(|rsp| Ok(VaultResponse(rsp)))
+            .and_then(|rsp| Ok(Response(rsp)))
             .map_err(crate::error::reqwest)
     }
 
-    pub(crate) async fn list(&self, key: &str) -> crate::error::Result<VaultResponse> {
+    pub(crate) async fn list(&self, key: &str) -> crate::error::Result<Response> {
         self.http_client
             .request(
                 reqwest::Method::from_bytes("LIST".as_bytes()).unwrap(),
@@ -77,7 +75,7 @@ impl VaultClient {
             )
             .send()
             .await
-            .and_then(|rsp| Ok(VaultResponse(rsp)))
+            .and_then(|rsp| Ok(Response(rsp)))
             .map_err(crate::error::reqwest)
     }
 
@@ -85,13 +83,13 @@ impl VaultClient {
         &self,
         key: &str,
         query: &T,
-    ) -> crate::error::Result<VaultResponse> {
+    ) -> crate::error::Result<Response> {
         self.http_client
             .get(&format!("{}/{}", self.endpoint, key))
             .query(query)
             .send()
             .await
-            .and_then(|rsp| Ok(VaultResponse(rsp)))
+            .and_then(|rsp| Ok(Response(rsp)))
             .map_err(crate::error::reqwest)
     }
 }

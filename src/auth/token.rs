@@ -1,4 +1,4 @@
-use crate::{VaultClient, VaultSecret};
+use crate::{Client, Secret};
 use std::collections::HashMap;
 
 #[derive(Deserialize, Serialize, Default)]
@@ -37,24 +37,24 @@ struct RenewTokenSelfRequest {
     increment: Option<String>,
 }
 
-impl VaultClient {
+impl Client {
     pub async fn create_token(
         &self,
         req: &CreateTokenRequest,
-    ) -> crate::Result<VaultSecret<()>> {
+    ) -> crate::Result<Secret<()>> {
         self.post("auth/token/create", req)
             .await?
-            .parse::<VaultSecret<()>>()
+            .parse::<Secret<()>>()
             .await
     }
 
     pub async fn create_token_orphan(
         &self,
         req: &CreateTokenRequest,
-    ) -> crate::Result<VaultSecret<()>> {
+    ) -> crate::Result<Secret<()>> {
         self.post("auth/token/create-orphan", req)
             .await?
-            .parse::<VaultSecret<()>>()
+            .parse::<Secret<()>>()
             .await
     }
 
@@ -62,27 +62,27 @@ impl VaultClient {
         &self,
         role: &str,
         req: &CreateTokenRequest,
-    ) -> crate::Result<VaultSecret<()>> {
+    ) -> crate::Result<Secret<()>> {
         self.post(&format!("auth/token/create/{}", role), req)
             .await?
-            .parse::<VaultSecret<()>>()
+            .parse::<Secret<()>>()
             .await
     }
 
     pub async fn lookup_token(
         &self,
         req: LookupTokenRequest,
-    ) -> crate::Result<VaultSecret<()>> {
+    ) -> crate::Result<Secret<()>> {
         self.post("auth/token/lookup", req)
             .await?
-            .parse::<VaultSecret<()>>()
+            .parse::<Secret<()>>()
             .await
     }
 
-    pub async fn lookup_token_self(&self) -> crate::Result<VaultSecret<()>> {
+    pub async fn lookup_token_self(&self) -> crate::Result<Secret<()>> {
         self.get("auth/token/lookup-self")
             .await?
-            .parse::<VaultSecret<()>>()
+            .parse::<Secret<()>>()
             .await
     }
 
@@ -90,7 +90,7 @@ impl VaultClient {
         &self,
         token: &str,
         increment: Option<&str>,
-    ) -> crate::error::Result<VaultSecret<()>> {
+    ) -> crate::error::Result<Secret<()>> {
         self.post(
             "auth/token/renew",
             &RenewTokenRequest {
@@ -99,14 +99,14 @@ impl VaultClient {
             },
         )
         .await?
-        .parse::<VaultSecret<()>>()
+        .parse::<Secret<()>>()
         .await
     }
 
     pub async fn renew_token_self(
         &self,
         increment: Option<&str>,
-    ) -> crate::error::Result<VaultSecret<()>> {
+    ) -> crate::error::Result<Secret<()>> {
         self.post(
             "auth/token/renew-self",
             &RenewTokenSelfRequest {
@@ -114,7 +114,7 @@ impl VaultClient {
             },
         )
             .await?
-            .parse::<VaultSecret<()>>()
+            .parse::<Secret<()>>()
             .await
     }
 }

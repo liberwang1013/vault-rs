@@ -2,21 +2,12 @@ use futures_util::TryFutureExt;
 use serde::de::DeserializeOwned;
 use serde::Deserialize;
 use std::collections::HashMap;
-pub(crate) struct VaultResponse(pub(crate) reqwest::Response);
+pub(crate) struct Response(pub(crate) reqwest::Response);
 
 use bytes::Bytes;
 
-#[derive(Deserialize, Serialize, Default, Debug)]
-pub struct VaultMetadata {
-    request_id: String,
-    lease_id: String,
-    renewable: bool,
-    lease_duration: i32,
-    warnings: Option<Vec<String>>,
-}
-
 #[derive(Deserialize, Serialize, Debug)]
-pub struct VaultAuth {
+pub struct SecretAuth {
     pub client_token: String,
     pub accessor: String,
     pub policies: Vec<String>,
@@ -29,7 +20,7 @@ pub struct VaultAuth {
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct VaultWrapInfo {
+pub struct SecretWrapInfo {
     pub token: String,
     pub accessor: String,
     pub ttl: i32,
@@ -39,15 +30,18 @@ pub struct VaultWrapInfo {
 }
 
 #[derive(Deserialize, Serialize, Debug, Default)]
-pub struct VaultSecret<T> {
-    #[serde(flatten)]
-    pub meta: VaultMetadata,
-    pub auth: Option<VaultAuth>,
-    pub wrap_infos: Option<VaultWrapInfo>,
+pub struct Secret<T> {
+    pub request_id: String,
+    pub release_id: String,
+    pub renewable: bool,
+    pub lease_duration: i32,
     pub data: Option<T>,
+    pub warnings: Option<Vec<String>>,
+    pub auth: Option<SecretAuth>,
+    pub wrap_infos: Option<SecretWrapInfo>,
 }
 
-impl VaultResponse {
+impl Response {
     pub async fn bytes(self) -> reqwest::Result<Bytes> {
         self.0.bytes().await
     }

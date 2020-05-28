@@ -1,42 +1,11 @@
-use crate::client::VaultClient;
-use crate::response::VaultSecret;
+use crate::client::Client;
+use crate::response::Secret;
 use std::collections::HashMap;
 
 const DEFAULT_PATH_KV2: &str = "secret";
 
 #[derive(Deserialize, Serialize, Default, Debug)]
-pub struct VaultKv2Metadata {
-    created_time: String,
-    deletion_time: String,
-    destroyed: bool,
-    version: Option<i32>,
-}
-
-#[derive(Deserialize, Serialize, Default, Debug)]
-pub struct VaultKv2SecretMetadataDetail {
-    created_time: String,
-    current_version: i32,
-    max_versions: i32,
-    oldest_version: i32,
-    updated_time: String,
-    versions: HashMap<String, String>,
-}
-
-type KvData = HashMap<String, String>;
-#[derive(Deserialize, Serialize, Default, Debug)]
-pub struct Kv2Data {
-    data: KvData,
-    metadata: VaultKv2Metadata,
-}
-
-#[derive(Deserialize, Serialize, Default, Debug)]
-pub struct Kv2KeyList {
-    keys: Vec<String>,
-    metadata: VaultKv2Metadata,
-}
-
-#[derive(Deserialize, Serialize, Default, Debug)]
-pub struct VaultKv2Config {
+pub struct KV2Config {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cas_required: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -45,28 +14,59 @@ pub struct VaultKv2Config {
     pub delete_version_after: Option<String>,
 }
 
+#[derive(Deserialize, Serialize, Default, Debug)]
+pub struct KV2VersionMetadata {
+    created_time: String,
+    deletion_time: String,
+    destroyed: bool,
+    version: Option<i32>,
+}
+
+#[derive(Deserialize, Serialize, Default, Debug)]
+pub struct KV2Metadata {
+    created_time: String,
+    current_version: i32,
+    max_versions: i32,
+    oldest_version: i32,
+    updated_time: String,
+    versions: HashMap<String, KV2VersionMetadata>,
+}
+
+#[derive(Deserialize, Serialize, Default, Debug)]
+pub struct KV2VersionData {
+    data: HashMap<String, String>,
+    metadata: KV2VersionMetadata,
+}
+
+#[derive(Deserialize, Serialize, Default, Debug)]
+pub struct Kv2KeyList {
+    keys: Vec<String>,
+    metadata: KV2VersionMetadata,
+}
+
 #[derive(Serialize, Debug)]
-pub struct VaultKv2Options {
+pub struct KV2Options {
     cas: Option<i32>,
 }
 
 #[derive(Serialize, Debug, Default)]
-pub struct VaultPutKv2Request {
+pub struct PutKV2Request {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub options: Option<VaultKv2Options>,
-    pub data: KvData,
+    pub options: Option<KV2Options>,
+    pub data: HashMap<String, String>,
 }
 
 #[derive(Serialize)]
-pub struct UndeleteKv2VersionsRequest {
+pub struct UndeleteKV2VersionsRequest {
     pub versions: Vec<i32>,
 }
 
-impl VaultClient {
+impl Client {
+    //
     pub async fn put_kv_config(
         &self,
         mount: Option<&str>,
-        data: &VaultKv2Config,
+        data: &KV2Config,
     ) -> crate::Result<()> {
         self.post(
             &format!("{}/config", mount.unwrap_or(DEFAULT_PATH_KV2)),
@@ -79,10 +79,10 @@ impl VaultClient {
     pub async fn get_kv_config(
         &self,
         mount: Option<&str>,
-    ) -> crate::Result<VaultSecret<VaultKv2Config>> {
+    ) -> crate::Result<Secret<KV2Config>> {
         self.get(&format!("{}/config", mount.unwrap_or(DEFAULT_PATH_KV2)))
             .await?
-            .parse::<VaultSecret<VaultKv2Config>>()
+            .parse::<Secret<KV2Config>>()
             .await
     }
 
@@ -91,7 +91,7 @@ impl VaultClient {
         mount: Option<&str>,
         kv: &str,
         version: Option<i32>,
-    ) -> crate::Result<VaultSecret<Kv2Data>> {
+    ) -> crate::Result<Secret<KV2VersionData>> {
         match version {
             Some(v) => {
                 self.get_with_query(
@@ -99,7 +99,7 @@ impl VaultClient {
                     &[("version", v)],
                 )
                 .await?
-                .parse::<VaultSecret<Kv2Data>>()
+                .parse::<Secret<KV2VersionData>>()
                 .await
             }
             None => {
@@ -109,7 +109,7 @@ impl VaultClient {
                     kv
                 ))
                 .await?
-                .parse::<VaultSecret<Kv2Data>>()
+                .parse::<Secret<KV2VersionData>>()
                 .await
             }
         }
@@ -119,14 +119,29 @@ impl VaultClient {
         &self,
         mount: Option<&str>,
         kv: &str,
-        data: &VaultPutKv2Request,
-    ) -> crate::Result<VaultSecret<VaultKv2Metadata>> {
+        data: &PutKV2Request,
+    ) -> crate::Result<Secret<KV2VersionMetadata>> {
         self.post(
             &format!("{}/data/{}", mount.unwrap_or(DEFAULT_PATH_KV2), kv),
             data,
         )
         .await?
-        .parse::<VaultSecret<VaultKv2Metadata>>()
+        .parse::<Secret<KV2VersionMetadata>>()
+        .await
+    }
+
+    pub async fn delete_kv(
+        &self,
+        mount: Option<&str>,
+        kv: &str,
+    ) -> crate::Result<Secret<KV2VersionMetadata>> {
+        self.delete(&format!(
+            "{}/data/{}",
+            mount.unwrap_or(DEFAULT_PATH_KV2),
+            kv
+        ))
+        .await?
+        .parse::<Secret<KV2VersionMetadata>>()
         .await
     }
 
@@ -135,13 +150,13 @@ impl VaultClient {
         mount: Option<&str>,
         kv: &str,
         versions: Vec<i32>,
-    ) -> crate::Result<VaultSecret<()>> {
-        self.delete(
+    ) -> crate::Result<Secret<()>> {
+        self.post(
             &format!("{}/delete/{}", mount.unwrap_or(DEFAULT_PATH_KV2), kv),
             versions,
         )
         .await?
-        .parse::<VaultSecret<()>>()
+        .parse::<Secret<()>>()
         .await
     }
 
@@ -150,13 +165,13 @@ impl VaultClient {
         mount: Option<&str>,
         kv: &str,
         versions: Vec<i32>,
-    ) -> crate::Result<VaultSecret<()>> {
+    ) -> crate::Result<Secret<()>> {
         self.post(
             &format!("{}/undelete/{}", mount.unwrap_or(DEFAULT_PATH_KV2), kv),
             versions,
         )
         .await?
-        .parse::<VaultSecret<()>>()
+        .parse::<Secret<()>>()
         .await
     }
 
@@ -165,13 +180,13 @@ impl VaultClient {
         mount: Option<&str>,
         kv: &str,
         versions: Vec<i32>,
-    ) -> crate::Result<VaultSecret<()>> {
+    ) -> crate::Result<Secret<()>> {
         self.post(
             &format!("{}/destroy/{}", mount.unwrap_or(DEFAULT_PATH_KV2), kv),
             versions,
         )
         .await?
-        .parse::<VaultSecret<()>>()
+        .parse::<Secret<()>>()
         .await
     }
 
@@ -179,14 +194,14 @@ impl VaultClient {
         &self,
         mount: Option<&str>,
         path: &str,
-    ) -> crate::Result<VaultSecret<Kv2KeyList>> {
+    ) -> crate::Result<Secret<Kv2KeyList>> {
         self.list(&format!(
             "{}/metadata/{}",
             mount.unwrap_or(DEFAULT_PATH_KV2),
             path
         ))
         .await?
-        .parse::<VaultSecret<Kv2KeyList>>()
+        .parse::<Secret<Kv2KeyList>>()
         .await
     }
 
@@ -194,10 +209,14 @@ impl VaultClient {
         &self,
         mount: Option<&str>,
         path: &str,
-    ) -> crate::Result<VaultSecret<VaultKv2SecretMetadataDetail>> {
-        self.get(&format!("{}/metadata/{}", mount.unwrap_or(DEFAULT_PATH_KV2), path))
-            .await?
-            .parse::<VaultSecret<VaultKv2SecretMetadataDetail>>()
-            .await
+    ) -> crate::Result<Secret<KV2Metadata>> {
+        self.get(&format!(
+            "{}/metadata/{}",
+            mount.unwrap_or(DEFAULT_PATH_KV2),
+            path
+        ))
+        .await?
+        .parse::<Secret<KV2Metadata>>()
+        .await
     }
 }
