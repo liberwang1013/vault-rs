@@ -1,4 +1,4 @@
-use crate::{VaultClient, VaultSecret};
+use crate::{Client, Secret};
 const DEFAULT_PATH_TOTP: &str = "totp";
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -78,7 +78,7 @@ pub struct TotpVerifyResult {
     pub valid: bool,
 }
 
-impl VaultClient {
+impl Client {
     pub async fn create_totp_key(
         &self,
         mount: Option<&str>,
@@ -97,14 +97,14 @@ impl VaultClient {
         &self,
         mount: Option<&str>,
         key: &str,
-    ) -> crate::Result<VaultSecret<TotpKey>> {
+    ) -> crate::Result<Secret<TotpKey>> {
         self.get(&format!(
             "{}/keys/{}",
             mount.unwrap_or(DEFAULT_PATH_TOTP),
             key
         ))
         .await?
-        .parse::<VaultSecret<TotpKey>>()
+        .parse::<Secret<TotpKey>>()
         .await
     }
 
@@ -112,14 +112,14 @@ impl VaultClient {
         &self,
         mount: Option<&str>,
         key: &str,
-    ) -> crate::Result<VaultSecret<TotpCode>> {
+    ) -> crate::Result<Secret<TotpCode>> {
         self.get(&format!(
             "{}/code/{}",
             mount.unwrap_or(DEFAULT_PATH_TOTP),
             key
         ))
         .await?
-        .parse::<VaultSecret<TotpCode>>()
+        .parse::<Secret<TotpCode>>()
         .await
     }
 
@@ -128,13 +128,13 @@ impl VaultClient {
         mount: Option<&str>,
         key: &str,
         code: TotpCode,
-    ) -> crate::Result<VaultSecret<TotpVerifyResult>> {
+    ) -> crate::Result<Secret<TotpVerifyResult>> {
         self.post(
             &format!("{}/code/{}", mount.unwrap_or(DEFAULT_PATH_TOTP), key),
             code,
         )
         .await?
-        .parse::<VaultSecret<TotpVerifyResult>>()
+        .parse::<Secret<TotpVerifyResult>>()
         .await
     }
 }

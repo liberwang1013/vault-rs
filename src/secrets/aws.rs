@@ -1,5 +1,5 @@
-use crate::client::VaultClient;
-use crate::response::VaultSecret;
+use crate::client::Client;
+use crate::response::Secret;
 use std::env;
 
 const DEFAULT_PATH_AWS: &str = "aws";
@@ -49,17 +49,17 @@ pub struct AwsRole {
     pub role_arns: Vec<String>,
 }
 
-impl VaultClient {
+impl Client {
     pub async fn get_aws_root_config(
         &self,
         mount: Option<&str>,
-    ) -> crate::Result<VaultSecret<AwsRootConfig>> {
+    ) -> crate::Result<Secret<AwsRootConfig>> {
         self.get(&format!(
             "{}/config/root",
             mount.unwrap_or(DEFAULT_PATH_AWS)
         ))
         .await?
-        .parse::<VaultSecret<AwsRootConfig>>()
+        .parse::<Secret<AwsRootConfig>>()
         .await
     }
 
@@ -80,14 +80,14 @@ impl VaultClient {
         &self,
         mount: Option<&str>,
         role: &str,
-    ) -> crate::Result<VaultSecret<AwsRole>> {
+    ) -> crate::Result<Secret<AwsRole>> {
         self.get(&format!(
             "{}/roles/{}",
             mount.unwrap_or(DEFAULT_PATH_AWS),
             role
         ))
         .await?
-        .parse::<VaultSecret<AwsRole>>()
+        .parse::<Secret<AwsRole>>()
         .await
     }
 
@@ -95,14 +95,14 @@ impl VaultClient {
         &self,
         mount: Option<&str>,
         role: &str,
-    ) -> crate::Result<VaultSecret<AwsCredential>> {
+    ) -> crate::Result<Secret<AwsCredential>> {
         self.get(&format!(
             "{}/sts/{}",
             mount.unwrap_or(DEFAULT_PATH_AWS),
             role
         ))
         .await?
-        .parse::<VaultSecret<AwsCredential>>()
+        .parse::<Secret<AwsCredential>>()
         .await
     }
 }
