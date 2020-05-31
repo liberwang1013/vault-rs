@@ -32,7 +32,7 @@ pub struct SecretWrapInfo {
 #[derive(Deserialize, Serialize, Debug, Default)]
 pub struct Secret<T> {
     pub request_id: String,
-    pub release_id: String,
+    pub lease_id: String,
     pub renewable: bool,
     pub lease_duration: i32,
     pub data: Option<T>,

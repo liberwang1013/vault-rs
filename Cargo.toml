@@ -9,9 +9,10 @@ name = "vault"
 path = "src/lib.rs"
 
 [dev-dependencies]
-log = "^0.4"
+log = "0.4"
 env_logger = "0.7"
-tokio = "0.2.0-alpha.6"
+tokio = "0.2"
+clap = "2.33"
 
 [dependencies]
 url = "^2.1"

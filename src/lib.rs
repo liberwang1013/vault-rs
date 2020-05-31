@@ -6,7 +6,7 @@ extern crate bytes;
 extern crate reqwest;
 
 pub mod auth;
-pub mod system;
+pub mod sys;
 mod client;
 pub mod error;
 pub mod response;

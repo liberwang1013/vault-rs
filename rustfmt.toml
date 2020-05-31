@@ -1,3 +1,4 @@
 edition = "2018"
-max_width = 89
+max_width = 100
 reorder_imports = true
+merge_imports = true
