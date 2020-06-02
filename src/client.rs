@@ -12,6 +12,12 @@ pub struct Client {
     pub http_client: reqwest::Client,
 }
 
+fn on_response(rsp: reqwest::Response) -> crate::error::Result<Response> {
+    rsp.error_for_status()
+        .and_then(|res| Ok(Response(res)))
+        .map_err(crate::error::reqwest)
+}
+
 impl Client {
     pub fn new() -> crate::error::Result<Client> {
         let addr = env::var(VAULT_ADDR).unwrap_or_else(|_| String::from(DEFAULT_VAULT_ADDR));
@@ -41,8 +47,8 @@ impl Client {
             .json(&data)
             .send()
             .await
-            .and_then(|rsp| Ok(Response(rsp)))
             .map_err(crate::error::reqwest)
+            .and_then(on_response)
     }
 
     pub(crate) async fn put<R: Serialize>(
@@ -55,8 +61,8 @@ impl Client {
             .json(&data)
             .send()
             .await
-            .and_then(|rsp| Ok(Response(rsp)))
             .map_err(crate::error::reqwest)
+            .and_then(on_response)
     }
 
     pub(crate) async fn get(&self, key: &str) -> crate::error::Result<Response> {
@@ -64,8 +70,8 @@ impl Client {
             .get(&format!("{}/{}", self.endpoint, key))
             .send()
             .await
-            .and_then(|rsp| Ok(Response(rsp)))
             .map_err(crate::error::reqwest)
+            .and_then(on_response)
     }
 
     pub(crate) async fn delete(&self, key: &str) -> crate::error::Result<Response> {
@@ -73,8 +79,8 @@ impl Client {
             .delete(&format!("{}/{}", self.endpoint, key))
             .send()
             .await
-            .and_then(|rsp| Ok(Response(rsp)))
             .map_err(crate::error::reqwest)
+            .and_then(on_response)
     }
 
     pub(crate) async fn list(&self, key: &str) -> crate::error::Result<Response> {
@@ -85,8 +91,8 @@ impl Client {
             )
             .send()
             .await
-            .and_then(|rsp| Ok(Response(rsp)))
             .map_err(crate::error::reqwest)
+            .and_then(on_response)
     }
 
     pub(crate) async fn get_with_query<T: Serialize + ?Sized>(
@@ -99,7 +105,7 @@ impl Client {
             .query(query)
             .send()
             .await
-            .and_then(|rsp| Ok(Response(rsp)))
             .map_err(crate::error::reqwest)
+            .and_then(on_response)
     }
 }

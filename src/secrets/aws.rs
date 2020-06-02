@@ -41,12 +41,18 @@ pub struct AwsCredential {
     pub security_token: String,
 }
 
+#[derive(Deserialize, Serialize)]
+pub struct AwsLease {
+    pub lease: String,
+    pub lease_max: String,
+}
+
 #[derive(Deserialize)]
 pub struct AwsRole {
-    pub policy_document: String,
-    pub policy_arns: Vec<String>,
     pub credential_types: Vec<String>,
-    pub role_arns: Vec<String>,
+    pub policy_document: Option<String>,
+    pub policy_arns: Option<Vec<String>>,
+    pub role_arns: Option<Vec<String>>,
 }
 
 impl Client {
@@ -74,6 +80,30 @@ impl Client {
         )
         .await
         .and_then(|_| Ok(()))
+    }
+
+    // TODO
+
+    pub async fn put_aws_lease(&self, mount: Option<&str>, lease: AwsLease) -> crate::Result<()> {
+        self.post(
+            &format!("{}/config/lease", mount.unwrap_or(DEFAULT_PATH_AWS)),
+            lease,
+        )
+        .await
+        .and_then(|_| Ok(()))
+    }
+
+    pub async fn get_aws_lease(
+        &self,
+        mount: Option<&str>,
+    ) -> crate::Result<Secret<AwsLease>> {
+        self.get(&format!(
+            "{}/config/lease",
+            mount.unwrap_or(DEFAULT_PATH_AWS)
+        ))
+        .await?
+        .parse::<Secret<AwsLease>>()
+        .await
     }
 
     pub async fn get_role(
