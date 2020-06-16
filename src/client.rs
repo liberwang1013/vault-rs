@@ -15,7 +15,10 @@ pub struct Client {
 fn on_response(rsp: reqwest::Response) -> crate::error::Result<Response> {
     rsp.error_for_status()
         .and_then(|res| Ok(Response(res)))
-        .map_err(crate::error::reqwest)
+        .map_err(|e| {
+            let code = e.status().unwrap();
+            crate::error::status_code(e, code)
+        })
 }
 
 impl Client {

@@ -14,3 +14,5 @@ pub mod secrets;
 pub use crate::client::Client;
 pub use crate::error::Result;
 pub use crate::response::Secret;
+
+pub use reqwest::{StatusCode, Url};
