@@ -1,7 +1,7 @@
 use std::error::Error as StdError;
 use std::fmt;
 
-use reqwest::{Url};
+use reqwest::{Url, StatusCode};
 
 /// A `Result` alias where the `Err` case is "vault::Error`.
 pub type Result<T> = std::result::Result<T, Error>;
@@ -18,6 +18,7 @@ pub(crate) enum Kind {
     Builder,
     Decode,
     Reqwest,
+    Status(StatusCode),
 }
 
 struct Inner {
@@ -56,6 +57,26 @@ impl Error {
             }),
         }
     }
+
+    /// Returns true if the error is from `Response::error_for_status`.
+    pub fn is_status(&self) -> bool {
+        match self.inner.kind {
+            Kind::Status(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn status(&self) -> Option<StatusCode> {
+        match self.inner.kind {
+            Kind::Status(code) => Some(code),
+            _ => None
+        }
+    }
+
+    pub(crate) fn with_url(mut self, url: Url) -> Error {
+        self.inner.url = Some(url);
+        self
+    }
 }
 
 pub(crate) fn builder<E: Into<BoxError>>(e: E) -> Error {
@@ -68,4 +89,8 @@ pub(crate) fn decode<E: Into<BoxError>>(e: E) -> Error {
 
 pub(crate) fn reqwest<E: Into<BoxError>>(e: E) -> Error {
     Error::new(Kind::Reqwest, Some(e))
+}
+
+pub(crate) fn status_code<E: Into<BoxError>>(e: E, code: StatusCode) -> Error {
+    Error::new(Kind::Status(code), Some(e))
 }
