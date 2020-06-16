@@ -50,49 +50,9 @@ pub struct AwsLease {
 #[derive(Deserialize)]
 pub struct AwsRole {
     pub credential_types: Vec<String>,
-    #[serde(flatten)]
-    pub config: AwsRoleConfig,
-    //pub policy_document: Option<String>,
-    //pub policy_arns: Option<Vec<String>>,
-    //pub role_arns: Option<Vec<String>>,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct AwsRoleAssumedRoleConfig {
-    pub role_arns: Vec<String>,
-    pub default_sts_ttl: Option<String>,
-    pub max_sts_ttl: Option<String>,
-}
-
-#[derive(Serialize, Deserialize)]
-#[serde(tag = "credential_type")]
-pub enum AwsRoleConfig {
-    iam_user {
-        policy_arns: Option<Vec<String>>,
-        policy_document: Option<String>,
-        user_path: Option<String>,
-        permissions_boundary_arn: Option<String>
-
-    },
-    assumed_role {
-        role_arns: Option<Vec<String>>,
-        policy_document: Option<String>,
-        default_sts_ttl: Option<String>,
-        max_sts_ttl: Option<String>,
-    },
-    federation_token {
-        role_arns: Option<Vec<String>>,
-        policy_document: Option<String>,
-        default_sts_ttl: Option<String>,
-        max_sts_ttl: Option<String>,
-    },
-}
-
-#[derive(Deserialize)]
-pub struct PutAwsRoleRequest {
-    pub credential_type: String,
-    #[serde(flatten)]
-    pub config: AwsRoleConfig,
+    pub policy_document: Option<String>,
+    pub policy_arns: Option<Vec<String>>,
+    pub role_arns: Option<Vec<String>>,
 }
 
 impl Client {
@@ -133,7 +93,10 @@ impl Client {
         .and_then(|_| Ok(()))
     }
 
-    pub async fn get_aws_lease(&self, mount: Option<&str>) -> crate::Result<Secret<AwsLease>> {
+    pub async fn get_aws_lease(
+        &self,
+        mount: Option<&str>,
+    ) -> crate::Result<Secret<AwsLease>> {
         self.get(&format!(
             "{}/config/lease",
             mount.unwrap_or(DEFAULT_PATH_AWS)
@@ -142,8 +105,6 @@ impl Client {
         .parse::<Secret<AwsLease>>()
         .await
     }
-
-    pub async fn put_role(&self, mount: &str, config: AwsRoleConfig) {}
 
     pub async fn get_role(
         &self,
