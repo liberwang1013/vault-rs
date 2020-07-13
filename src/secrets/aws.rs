@@ -47,12 +47,68 @@ pub struct AwsLease {
     pub lease_max: String,
 }
 
-#[derive(Deserialize)]
-pub struct AwsRole {
-    pub credential_types: Vec<String>,
-    pub policy_document: Option<String>,
-    pub policy_arns: Option<Vec<String>>,
-    pub role_arns: Option<Vec<String>>,
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(tag = "credential_type")]
+pub enum AwsRole {
+    #[serde(rename = "iam_user")]
+    IamUser(IamUser),
+    #[serde(rename = "assumed_role")]
+    AssumedRole(AssumedRole),
+    #[serde(rename = "federation_token")]
+    FederationToken(FederationToken),
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct PolicyArns {
+    pub policy_arns: Vec<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct PolicyDocument {
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub policy_document: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(untagged)]
+pub enum AwsIamPolicConfig {
+    PolicyArns(PolicyArns),
+    PolicyDocument(PolicyDocument),
+}
+
+fn default_user_path() -> String {
+    "/".to_string()
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct AssumedRole {
+    pub role_arns: Vec<String>,
+    #[serde(default = "default_user_path")]
+    pub user_path: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct IamUser {
+    #[serde(flatten)]
+    pub aws_iam_policy: AwsIamPolicConfig,
+    pub default_sts_ttl: i32,
+    pub max_sts_ttl: i32,
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub permissions_boundary_arn: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct FederationToken {
+    #[serde(flatten)]
+    pub aws_iam_policy: AwsIamPolicConfig,
+    pub default_sts_ttl: i32,
+    pub max_sts_ttl: i32,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct AwsRoles {
+    #[serde(rename = "keys")]
+    pub roles: Vec<String>,
 }
 
 impl Client {
@@ -82,8 +138,6 @@ impl Client {
         .and_then(|_| Ok(()))
     }
 
-    // TODO
-
     pub async fn put_aws_lease(&self, mount: Option<&str>, lease: AwsLease) -> crate::Result<()> {
         self.post(
             &format!("{}/config/lease", mount.unwrap_or(DEFAULT_PATH_AWS)),
@@ -93,10 +147,7 @@ impl Client {
         .and_then(|_| Ok(()))
     }
 
-    pub async fn get_aws_lease(
-        &self,
-        mount: Option<&str>,
-    ) -> crate::Result<Secret<AwsLease>> {
+    pub async fn get_aws_lease(&self, mount: Option<&str>) -> crate::Result<Secret<AwsLease>> {
         self.get(&format!(
             "{}/config/lease",
             mount.unwrap_or(DEFAULT_PATH_AWS)
@@ -104,6 +155,20 @@ impl Client {
         .await?
         .parse::<Secret<AwsLease>>()
         .await
+    }
+
+    pub async fn put_role(
+        &self,
+        mount: Option<&str>,
+        name: &str,
+        role: AwsRole,
+    ) -> crate::Result<()> {
+        self.post(
+            &format!("{}/roles/{}", mount.unwrap_or(DEFAULT_PATH_AWS), name,),
+            role,
+        )
+        .await
+        .and_then(|_| Ok(()))
     }
 
     pub async fn get_role(
@@ -121,6 +186,23 @@ impl Client {
         .await
     }
 
+    pub async fn list_roles(&self, mount: Option<&str>) -> crate::Result<Secret<AwsRoles>> {
+        self.list(&format!("{}/roles", mount.unwrap_or(DEFAULT_PATH_AWS)))
+            .await?
+            .parse::<Secret<AwsRoles>>()
+            .await
+    }
+
+    pub async fn delete_role(&self, mount: Option<&str>, name: &str) -> crate::Result<()> {
+        self.delete(&format!(
+            "{}/roles/{}",
+            mount.unwrap_or(DEFAULT_PATH_AWS),
+            name
+        ))
+        .await
+        .and_then(|_| Ok(()))
+    }
+
     pub async fn generate_sts_credentials(
         &self,
         mount: Option<&str>,
@@ -128,6 +210,21 @@ impl Client {
     ) -> crate::Result<Secret<AwsCredential>> {
         self.get(&format!(
             "{}/sts/{}",
+            mount.unwrap_or(DEFAULT_PATH_AWS),
+            role
+        ))
+        .await?
+        .parse::<Secret<AwsCredential>>()
+        .await
+    }
+
+    pub async fn generate_credentials(
+        &self,
+        mount: Option<&str>,
+        role: &str,
+    ) -> crate::Result<Secret<AwsCredential>> {
+        self.get(&format!(
+            "{}/creds/{}",
             mount.unwrap_or(DEFAULT_PATH_AWS),
             role
         ))
