@@ -58,18 +58,18 @@ pub enum AwsRole {
     FederationToken(FederationToken),
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct PolicyArns {
     pub policy_arns: Vec<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct PolicyDocument {
     #[serde(skip_serializing_if = "String::is_empty")]
     pub policy_document: String,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(untagged)]
 pub enum AwsIamPolicConfig {
     PolicyArns(PolicyArns),
@@ -80,14 +80,14 @@ fn default_user_path() -> String {
     "/".to_string()
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct AssumedRole {
     pub role_arns: Vec<String>,
     #[serde(default = "default_user_path")]
     pub user_path: String,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct IamUser {
     #[serde(flatten)]
     pub aws_iam_policy: AwsIamPolicConfig,
@@ -97,7 +97,7 @@ pub struct IamUser {
     pub permissions_boundary_arn: String,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct FederationToken {
     #[serde(flatten)]
     pub aws_iam_policy: AwsIamPolicConfig,
@@ -105,7 +105,7 @@ pub struct FederationToken {
     pub max_sts_ttl: i32,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct AwsRoles {
     #[serde(rename = "keys")]
     pub roles: Vec<String>,

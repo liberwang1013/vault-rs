@@ -1,12 +1,12 @@
 use crate::{Client, Secret};
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
 pub struct SysPolicy {
     pub name: Option<String>,
     pub policy: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
 pub struct SysPolicies {
     pub keys: Vec<String>,
 }
@@ -27,9 +27,9 @@ impl Client {
     }
 
     pub async fn put_policy(&self, name: &str, policy: &str) -> crate::Result<()> {
-        let req = SysPolicy{
+        let req = SysPolicy {
             name: None,
-            policy: String::from(policy)
+            policy: String::from(policy),
         };
         self.put(&format!("sys/policies/acl/{}", name), req)
             .await
