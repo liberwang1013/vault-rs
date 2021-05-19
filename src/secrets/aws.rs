@@ -80,7 +80,7 @@ fn default_user_path() -> String {
     "/".to_string()
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct AssumedRole {
     pub role_arns: Vec<String>,
     #[serde(default = "default_user_path")]
