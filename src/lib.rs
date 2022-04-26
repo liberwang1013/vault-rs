@@ -6,12 +6,12 @@ extern crate bytes;
 extern crate reqwest;
 
 pub mod auth;
-pub mod sys;
 mod client;
 pub mod error;
 pub mod response;
 pub mod secrets;
-pub use crate::client::Client;
+pub mod sys;
+pub use crate::client::{Client, ClientBuilder};
 pub use crate::error::Result;
 pub use crate::response::Secret;
 

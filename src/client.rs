@@ -7,6 +7,7 @@ const VAULT_ADDR: &str = "VAULT_ADDR";
 const VAULT_TOKEN: &str = "VAULT_TOKEN";
 const DEFAULT_VAULT_ADDR: &str = "http://127.0.0.1:8200";
 
+#[derive(Clone)]
 pub struct Client {
     pub endpoint: String,
     pub http_client: reqwest::Client,
@@ -21,10 +22,46 @@ fn on_response(rsp: reqwest::Response) -> crate::error::Result<Response> {
         })
 }
 
+pub struct ClientBuilder {
+    address: Option<String>,
+    token: Option<String>,
+}
+
+impl ClientBuilder {
+    pub fn new() -> Self {
+        Self {
+            address: None,
+            token: None,
+        }
+    }
+
+    pub fn address(&mut self, address: String) -> &mut Self {
+        self.address = Some(address);
+        self
+    }
+
+    pub fn token(&mut self, token: String) -> &mut Self {
+        self.token = Some(token);
+        self
+    }
+
+    pub fn build(&self) -> crate::error::Result<Client> {
+        let addr = match &self.address {
+            Some(s) => s.to_owned(),
+            None => env::var(VAULT_ADDR).unwrap_or_else(|_| String::from(DEFAULT_VAULT_ADDR)),
+        };
+        let token = match &self.token {
+            Some(s) => s.to_owned(),
+            None => env::var(VAULT_TOKEN).map_err(crate::error::builder)?,
+        };
+        Client::new(addr, token)
+    }
+}
+
 impl Client {
-    pub fn new() -> crate::error::Result<Client> {
-        let addr = env::var(VAULT_ADDR).unwrap_or_else(|_| String::from(DEFAULT_VAULT_ADDR));
-        let token = env::var(VAULT_TOKEN).map_err(crate::error::builder)?;
+    pub fn new(addr: String, token: String) -> crate::error::Result<Client> {
+        // let addr = env::var(VAULT_ADDR).unwrap_or_else(|_| String::from(DEFAULT_VAULT_ADDR));
+        // let token = env::var(VAULT_TOKEN).map_err(crate::error::builder)?;
 
         let mut default_header = reqwest::header::HeaderMap::new();
         default_header.insert(VAULT_TOKEN_HEADER, token.parse().unwrap());
