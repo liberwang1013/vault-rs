@@ -2,7 +2,7 @@
 name = "vault"
 version = "0.0.3"
 authors = ["Liber Wang <liberwang1013@gmail.com>"]
-edition = "2018"
+edition = "2021"
 
 [lib]
 name = "vault"
@@ -11,10 +11,11 @@ path = "src/lib.rs"
 [dev-dependencies]
 log = "0.4"
 env_logger = "0.7"
-tokio = "0.2"
+tokio = { version = "1", features = ["full"] }
 clap = "2.33"
 
 [dependencies]
+log = "0.4"
 url = "2"
 http = "0.2"
 bytes = "1"
