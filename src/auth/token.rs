@@ -1,120 +1,118 @@
-use crate::{Client, Secret};
-use std::collections::HashMap;
+use serde::{Serialize, Deserialize};
+use derive_builder::Builder;
 
-#[derive(Deserialize, Serialize, Default)]
-pub struct CreateTokenRequest {
-    pub id: Option<String>,
-    pub policies: Option<Vec<String>>,
-    #[serde(skip_serializing_if = "HashMap::is_empty")]
-    pub meta: HashMap<String, String>,
-    pub lease: Option<String>,
-    pub ttl: Option<String>,
+#[derive(Debug, Clone, Default, Serialize, Deserialize, Builder)]
+#[builder(setter(strip_option), default)]
+pub struct CreateOrphanRequest {
+    pub display_name: Option<String>,
+    pub entity_alias: Option<String>,
     pub explicit_max_ttl: Option<String>,
-    pub period: Option<String>,
-    pub no_parent: Option<bool>,
+    pub id: Option<String>,
+    pub metadata: Option<serde_json::Map<String, serde_json::Value>>,
     pub no_default_policy: Option<bool>,
-    pub display_name: String,
-    pub num_uses: i32,
+    pub no_parent: Option<bool>,
+    pub num_uses: Option<i32>,
+    pub period: Option<String>,
+    pub policies: Option<Vec<String>>,
     pub renewable: Option<bool>,
-    #[serde(rename = "type")]
-    pub token_type: String,
-    pub entity_alias: String,
+    pub role_name: Option<String>,
+    pub ttl: Option<String>,
+    pub r#type: Option<String>,
 }
 
-#[derive(Serialize, Default)]
-pub struct LookupTokenRequest {
-    token: String,
+#[derive(Debug, Clone, Default, Serialize, Deserialize, Builder)]
+#[builder(setter(strip_option), default)]
+pub struct CreateRequest {
+    pub display_name: Option<String>,
+    pub entity_alias: Option<String>,
+    pub explicit_max_ttl: Option<String>,
+    pub id: Option<String>,
+    pub metadata: Option<serde_json::Map<String, serde_json::Value>>,
+    pub no_default_policy: Option<bool>,
+    pub no_parent: Option<bool>,
+    pub num_uses: Option<i32>,
+    pub period: Option<String>,
+    pub policies: Option<Vec<String>>,
+    pub renewable: Option<bool>,
+    pub ttl: Option<String>,
+    pub r#type: Option<String>,
 }
 
-#[derive(Serialize, Default)]
-struct RenewTokenRequest {
-    token: String,
-    increment: Option<String>,
+#[derive(Debug, Clone, Default, Serialize, Deserialize, Builder)]
+#[builder(setter(strip_option), default)]
+pub struct LookupAccessorRequest {
+    pub accessor: Option<String>,
 }
 
-#[derive(Serialize, Default)]
-struct RenewTokenSelfRequest {
-    increment: Option<String>,
+#[derive(Debug, Clone, Default, Serialize, Deserialize, Builder)]
+#[builder(setter(strip_option), default)]
+pub struct LookupRequest {
+    pub token: Option<String>,
 }
 
-impl Client {
-    pub async fn create_token(
-        &self,
-        req: &CreateTokenRequest,
-    ) -> crate::Result<Secret<()>> {
-        self.post("auth/token/create", req)
-            .await?
-            .parse::<Secret<()>>()
-            .await
-    }
+#[derive(Debug, Clone, Default, Serialize, Deserialize, Builder)]
+#[builder(setter(strip_option), default)]
+pub struct LookupSelfRequest {
+    pub token: Option<String>,
+}
 
-    pub async fn create_token_orphan(
-        &self,
-        req: &CreateTokenRequest,
-    ) -> crate::Result<Secret<()>> {
-        self.post("auth/token/create-orphan", req)
-            .await?
-            .parse::<Secret<()>>()
-            .await
-    }
+#[derive(Debug, Clone, Default, Serialize, Deserialize, Builder)]
+#[builder(setter(strip_option), default)]
+pub struct RenewAccessorRequest {
+    pub accessor: Option<String>,
+    pub increment: Option<i32>,
+}
 
-    pub async fn create_token_with_role(
-        &self,
-        role: &str,
-        req: &CreateTokenRequest,
-    ) -> crate::Result<Secret<()>> {
-        self.post(&format!("auth/token/create/{}", role), req)
-            .await?
-            .parse::<Secret<()>>()
-            .await
-    }
+#[derive(Debug, Clone, Default, Serialize, Deserialize, Builder)]
+#[builder(setter(strip_option), default)]
+pub struct RenewRequest {
+    pub increment: Option<i32>,
+    pub token: Option<String>,
+}
 
-    pub async fn lookup_token(
-        &self,
-        req: LookupTokenRequest,
-    ) -> crate::Result<Secret<()>> {
-        self.post("auth/token/lookup", req)
-            .await?
-            .parse::<Secret<()>>()
-            .await
-    }
+#[derive(Debug, Clone, Default, Serialize, Deserialize, Builder)]
+#[builder(setter(strip_option), default)]
+pub struct RenewSelfRequest {
+    pub increment: Option<i32>,
+    pub token: Option<String>,
+}
 
-    pub async fn lookup_token_self(&self) -> crate::Result<Secret<()>> {
-        self.get("auth/token/lookup-self")
-            .await?
-            .parse::<Secret<()>>()
-            .await
-    }
+#[derive(Debug, Clone, Default, Serialize, Deserialize, Builder)]
+#[builder(setter(strip_option), default)]
+pub struct RevokeAccessorRequest {
+    pub accessor: Option<String>,
+}
 
-    pub async fn renew_token(
-        &self,
-        token: &str,
-        increment: Option<&str>,
-    ) -> crate::error::Result<Secret<()>> {
-        self.post(
-            "auth/token/renew",
-            &RenewTokenRequest {
-                token: String::from(token),
-                increment: increment.map(|i| String::from(i)),
-            },
-        )
-        .await?
-        .parse::<Secret<()>>()
-        .await
-    }
+#[derive(Debug, Clone, Default, Serialize, Deserialize, Builder)]
+#[builder(setter(strip_option), default)]
+pub struct RevokeOrphanRequest {
+    pub token: Option<String>,
+}
 
-    pub async fn renew_token_self(
-        &self,
-        increment: Option<&str>,
-    ) -> crate::error::Result<Secret<()>> {
-        self.post(
-            "auth/token/renew-self",
-            &RenewTokenSelfRequest {
-                increment: increment.map(|i| String::from(i)),
-            },
-        )
-            .await?
-            .parse::<Secret<()>>()
-            .await
-    }
+#[derive(Debug, Clone, Default, Serialize, Deserialize, Builder)]
+#[builder(setter(strip_option), default)]
+pub struct RevokeRequest {
+    pub token: Option<String>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize, Builder)]
+#[builder(setter(strip_option), default)]
+pub struct RolesRequest {
+    pub allowed_entity_aliases: Option<Vec<String>>,
+    pub allowed_policies: Option<Vec<String>>,
+    pub allowed_policies_glob: Option<Vec<String>>,
+    pub bound_cidrs: Option<Vec<String>>,
+    pub disallowed_policies: Option<Vec<String>>,
+    pub disallowed_policies_glob: Option<Vec<String>>,
+    pub explicit_max_ttl: Option<i32>,
+    pub orphan: Option<bool>,
+    pub path_suffix: Option<String>,
+    pub period: Option<i32>,
+    pub renewable: Option<bool>,
+    pub token_bound_cidrs: Option<Vec<String>>,
+    pub token_explicit_max_ttl: Option<i32>,
+    pub token_no_default_policy: Option<bool>,
+    pub token_num_uses: Option<i32>,
+    pub token_period: Option<i32>,
+    pub token_type: Option<String>,
 }

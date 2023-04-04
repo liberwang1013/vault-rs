@@ -1,5 +1,6 @@
-use crate::response::Response;
-use serde::Serialize;
+use crate::{Error, Result, Secret};
+use http::Method;
+use serde::{de::DeserializeOwned, Serialize};
 use std::env;
 
 const VAULT_TOKEN_HEADER: &str = "X-VAULT-TOKEN";
@@ -11,15 +12,6 @@ const DEFAULT_VAULT_ADDR: &str = "http://127.0.0.1:8200";
 pub struct Client {
     pub endpoint: String,
     pub http_client: reqwest::Client,
-}
-
-fn on_response(rsp: reqwest::Response) -> crate::error::Result<Response> {
-    rsp.error_for_status()
-        .and_then(|res| Ok(Response(res)))
-        .map_err(|e| {
-            let code = e.status().unwrap();
-            crate::error::status_code(e, code)
-        })
 }
 
 pub struct ClientBuilder {
@@ -52,24 +44,21 @@ impl ClientBuilder {
         };
         let token = match &self.token {
             Some(s) => s.to_owned(),
-            None => env::var(VAULT_TOKEN).map_err(crate::error::builder)?,
+            None => env::var(VAULT_TOKEN).map_err(|_| Error::MissingToken)?,
         };
         Client::new(addr, token)
     }
 }
 
 impl Client {
+    #[allow(dead_code)]
     pub fn new(addr: String, token: String) -> crate::error::Result<Client> {
-        // let addr = env::var(VAULT_ADDR).unwrap_or_else(|_| String::from(DEFAULT_VAULT_ADDR));
-        // let token = env::var(VAULT_TOKEN).map_err(crate::error::builder)?;
-
         let mut default_header = reqwest::header::HeaderMap::new();
         default_header.insert(VAULT_TOKEN_HEADER, token.parse().unwrap());
 
         let client = reqwest::Client::builder()
             .default_headers(default_header)
-            .build()
-            .map_err(crate::error::builder)?;
+            .build()?;
 
         Ok(Client {
             endpoint: format!("{}/v1", addr),
@@ -77,75 +66,82 @@ impl Client {
         })
     }
 
-    pub(crate) async fn post<R: Serialize>(
+    #[allow(dead_code)]
+    pub async fn execute<R: DeserializeOwned>(&self, req: reqwest::Request) -> Result<Secret<R>> {
+        self.http_client
+            .execute(req)
+            .await?
+            .error_for_status()?
+            .json::<Secret<R>>()
+            .await
+            .map_err(|e| crate::Error::Reqwest(e))
+    }
+
+    #[allow(dead_code)]
+    pub async fn post<T: Serialize, R: DeserializeOwned>(
         &self,
         key: &str,
-        data: R,
-    ) -> crate::error::Result<Response> {
-        self.http_client
-            .post(&format!("{}/{}", self.endpoint, key))
+        data: T,
+    ) -> Result<Secret<R>> {
+        let req = self
+            .http_client
+            .request(Method::POST, format!("{}/{}", self.endpoint, key))
             .json(&data)
-            .send()
-            .await
-            .map_err(crate::error::reqwest)
-            .and_then(on_response)
+            .build()?;
+        self.execute(req).await
     }
 
-    pub(crate) async fn put<R: Serialize>(
+    #[allow(dead_code)]
+    pub async fn put<T: Serialize, R: DeserializeOwned>(
         &self,
         key: &str,
-        data: R,
-    ) -> crate::error::Result<Response> {
-        self.http_client
-            .post(&format!("{}/{}", self.endpoint, key))
+        data: T,
+    ) -> Result<Secret<R>> {
+        let req = self
+            .http_client
+            .request(Method::PUT, format!("{}/{}", self.endpoint, key))
             .json(&data)
-            .send()
-            .await
-            .map_err(crate::error::reqwest)
-            .and_then(on_response)
+            .build()?;
+        self.execute(req).await
     }
 
-    pub(crate) async fn get(&self, key: &str) -> crate::error::Result<Response> {
-        self.http_client
-            .get(&format!("{}/{}", self.endpoint, key))
-            .send()
-            .await
-            .map_err(crate::error::reqwest)
-            .and_then(on_response)
+    #[allow(dead_code)]
+    pub async fn get<R: DeserializeOwned>(
+        &self,
+        key: &str,
+        params: Option<Vec<(&str, &str)>>,
+    ) -> Result<Secret<R>> {
+        let mut builder = self
+            .http_client
+            .request(Method::GET, format!("{}/{}", self.endpoint, key));
+        builder = if let Some(params) = params {
+            builder.query(&params)
+        } else {
+            builder
+        };
+
+        let req = builder.build()?;
+        self.execute(req).await
     }
 
-    pub(crate) async fn delete(&self, key: &str) -> crate::error::Result<Response> {
-        self.http_client
-            .delete(&format!("{}/{}", self.endpoint, key))
-            .send()
-            .await
-            .map_err(crate::error::reqwest)
-            .and_then(on_response)
+    #[allow(dead_code)]
+    pub async fn delete<R: DeserializeOwned>(&self, key: &str) -> Result<Secret<R>> {
+        let req = self
+            .http_client
+            .request(Method::DELETE, format!("{}/{}", self.endpoint, key))
+            .build()?;
+        self.execute(req).await
     }
 
-    pub(crate) async fn list(&self, key: &str) -> crate::error::Result<Response> {
-        self.http_client
+    #[allow(dead_code)]
+    pub async fn list<R: DeserializeOwned>(&self, key: &str) -> Result<Secret<R>> {
+        let req = self
+            .http_client
             .request(
                 reqwest::Method::from_bytes("LIST".as_bytes()).unwrap(),
-                &format!("{}/{}", self.endpoint, key),
+                format!("{}/{}", self.endpoint, key),
             )
-            .send()
-            .await
-            .map_err(crate::error::reqwest)
-            .and_then(on_response)
-    }
-
-    pub(crate) async fn get_with_query<T: Serialize + ?Sized>(
-        &self,
-        key: &str,
-        query: &T,
-    ) -> crate::error::Result<Response> {
-        self.http_client
-            .get(&format!("{}/{}", self.endpoint, key))
-            .query(query)
-            .send()
-            .await
-            .map_err(crate::error::reqwest)
-            .and_then(on_response)
+            .build()?;
+        self.execute(req).await
     }
 }
