@@ -1,0 +1,303 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "HashiCorp Vault API",
+    "description": "HTTP API that gives you full access to Vault. All API routes are prefixed with `/v1/`.",
+    "version": "1.13.0",
+    "license": {
+      "name": "Mozilla Public License 2.0",
+      "url": "https://www.mozilla.org/en-US/MPL/2.0"
+    }
+  },
+  "paths": {
+    "/config": {
+      "description": "Manages the configuration for the Vault Auth Plugin.",
+      "x-vault-createSupported": true,
+      "get": {
+        "summary": "Manages the configuration for the Vault Auth Plugin.",
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "summary": "Manages the configuration for the Vault Auth Plugin.",
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Manages the configuration for the Vault Auth Plugin.",
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "empty body"
+          }
+        }
+      }
+    },
+    "/login": {
+      "description": "Determines the role that would be used for login from a valid OCI login request"
+    },
+    "/login/{role}": {
+      "description": "Authenticates to Vault using OCI credentials",
+      "parameters": [
+        {
+          "name": "role",
+          "description": "Name of the role.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "x-vault-unauthenticated": true,
+      "post": {
+        "summary": "Authenticates to Vault using OCI credentials",
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/role": {
+      "description": "Lists all the roles that are registered with Vault.",
+      "get": {
+        "summary": "Lists all the roles that are registered with Vault.",
+        "tags": [
+          "auth"
+        ],
+        "parameters": [
+          {
+            "name": "list",
+            "description": "Must be set to `true`",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true"
+              ]
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/role/{role}": {
+      "description": "Create a role and associate policies to it.",
+      "parameters": [
+        {
+          "name": "role",
+          "description": "Name of the role.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "x-vault-createSupported": true,
+      "get": {
+        "summary": "Create a role and associate policies to it.",
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a role and associate policies to it.",
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Create a role and associate policies to it.",
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "empty body"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ConfigRequest": {
+        "type": "object",
+        "properties": {
+          "home_tenancy_id": {
+            "type": "string",
+            "description": "The tenancy id of the account."
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "request_headers": {
+            "type": "string",
+            "description": "The signed headers of the client"
+          }
+        }
+      },
+      "RoleRequest": {
+        "type": "object",
+        "properties": {
+          "ocid_list": {
+            "type": "array",
+            "description": "A comma separated list of Group or Dynamic Group OCIDs that are allowed to take this role.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "token_bound_cidrs": {
+            "type": "array",
+            "description": "Comma separated string or JSON list of CIDR blocks. If set, specifies the blocks of IP addresses which are allowed to use the generated token.",
+            "items": {
+              "type": "string"
+            },
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Bound CIDRs",
+              "group": "Tokens"
+            }
+          },
+          "token_explicit_max_ttl": {
+            "type": "integer",
+            "description": "If set, tokens created via this role carry an explicit maximum TTL. During renewal, the current maximum TTL values of the role and the mount are not checked for changes, and any updates to these values will have no effect on the token being renewed.",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Explicit Maximum TTL",
+              "group": "Tokens"
+            }
+          },
+          "token_max_ttl": {
+            "type": "integer",
+            "description": "The maximum lifetime of the generated token",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Maximum TTL",
+              "group": "Tokens"
+            }
+          },
+          "token_no_default_policy": {
+            "type": "boolean",
+            "description": "If true, the 'default' policy will not automatically be added to generated tokens",
+            "x-vault-displayAttrs": {
+              "name": "Do Not Attach 'default' Policy To Generated Tokens",
+              "group": "Tokens"
+            }
+          },
+          "token_num_uses": {
+            "type": "integer",
+            "description": "The maximum number of times a token may be used, a value of zero means unlimited",
+            "x-vault-displayAttrs": {
+              "name": "Maximum Uses of Generated Tokens",
+              "group": "Tokens"
+            }
+          },
+          "token_period": {
+            "type": "integer",
+            "description": "If set, tokens created via this role will have no max lifetime; instead, their renewal period will be fixed to this value. This takes an integer number of seconds, or a string duration (e.g. \"24h\").",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Period",
+              "group": "Tokens"
+            }
+          },
+          "token_policies": {
+            "type": "array",
+            "description": "Comma-separated list of policies",
+            "items": {
+              "type": "string"
+            },
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Policies",
+              "group": "Tokens"
+            }
+          },
+          "token_ttl": {
+            "type": "integer",
+            "description": "The initial ttl of the token to generate",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Initial TTL",
+              "group": "Tokens"
+            }
+          },
+          "token_type": {
+            "type": "string",
+            "description": "The type of token to generate, service or batch",
+            "default": "default-service",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Type",
+              "group": "Tokens"
+            }
+          }
+        }
+      }
+    }
+  }
+}

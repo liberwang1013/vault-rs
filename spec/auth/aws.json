@@ -1,0 +1,1479 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "HashiCorp Vault API",
+    "description": "HTTP API that gives you full access to Vault. All API routes are prefixed with `/v1/`.",
+    "version": "1.13.0",
+    "license": {
+      "name": "Mozilla Public License 2.0",
+      "url": "https://www.mozilla.org/en-US/MPL/2.0"
+    }
+  },
+  "paths": {
+    "/config/certificate/{cert_name}": {
+      "description": "Adds the AWS Public Key that is used to verify the PKCS#7 signature of the identity document.",
+      "parameters": [
+        {
+          "name": "cert_name",
+          "description": "Name of the certificate.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "x-vault-createSupported": true,
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigCertificateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "empty body"
+          }
+        }
+      }
+    },
+    "/config/certificates": {
+      "description": "Lists all the AWS public certificates that are registered with the backend.",
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "parameters": [
+          {
+            "name": "list",
+            "description": "Must be set to `true`",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true"
+              ]
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/config/client": {
+      "description": "Configure AWS IAM credentials that are used to query instance and role details from the AWS API.",
+      "x-vault-createSupported": true,
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigClientRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "empty body"
+          }
+        }
+      }
+    },
+    "/config/identity": {
+      "description": "Configure the way the AWS auth method interacts with the identity store",
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigIdentityRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/config/rotate-root": {
+      "description": "Request to rotate the AWS credentials used by Vault",
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/config/sts": {
+      "description": "List all the AWS account/STS role relationships registered with Vault.",
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "parameters": [
+          {
+            "name": "list",
+            "description": "Must be set to `true`",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true"
+              ]
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/config/sts/{account_id}": {
+      "description": "Specify STS roles to be assumed for certain AWS accounts.",
+      "parameters": [
+        {
+          "name": "account_id",
+          "description": "AWS account ID to be associated with STS role. If set, Vault will use assumed credentials to verify any login attempts from EC2 instances in this account.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "x-vault-createSupported": true,
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigStsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "empty body"
+          }
+        }
+      }
+    },
+    "/config/tidy/identity-accesslist": {
+      "description": "Configures the periodic tidying operation of the access list identity entries.",
+      "x-vault-createSupported": true,
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigTidyIdentityAccesslistRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "empty body"
+          }
+        }
+      }
+    },
+    "/config/tidy/identity-whitelist": {
+      "description": "Configures the periodic tidying operation of the access list identity entries.",
+      "x-vault-createSupported": true,
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigTidyIdentityWhitelistRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "empty body"
+          }
+        }
+      }
+    },
+    "/config/tidy/roletag-blacklist": {
+      "description": "Configures the periodic tidying operation of the deny listed role tag entries.",
+      "x-vault-createSupported": true,
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigTidyRoletagBlacklistRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "empty body"
+          }
+        }
+      }
+    },
+    "/config/tidy/roletag-denylist": {
+      "description": "Configures the periodic tidying operation of the deny listed role tag entries.",
+      "x-vault-createSupported": true,
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigTidyRoletagDenylistRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "empty body"
+          }
+        }
+      }
+    },
+    "/identity-accesslist": {
+      "description": "Lists the items present in the identity access list.",
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "parameters": [
+          {
+            "name": "list",
+            "description": "Must be set to `true`",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true"
+              ]
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/identity-accesslist/{instance_id}": {
+      "description": "Read or delete entries in the identity access list.",
+      "parameters": [
+        {
+          "name": "instance_id",
+          "description": "EC2 instance ID. A successful login operation from an EC2 instance gets cached in this accesslist, keyed off of instance ID.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "empty body"
+          }
+        }
+      }
+    },
+    "/identity-whitelist": {
+      "description": "Lists the items present in the identity access list.",
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "parameters": [
+          {
+            "name": "list",
+            "description": "Must be set to `true`",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true"
+              ]
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/identity-whitelist/{instance_id}": {
+      "description": "Read or delete entries in the identity access list.",
+      "parameters": [
+        {
+          "name": "instance_id",
+          "description": "EC2 instance ID. A successful login operation from an EC2 instance gets cached in this accesslist, keyed off of instance ID.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "empty body"
+          }
+        }
+      }
+    },
+    "/login": {
+      "description": "Authenticates an EC2 instance with Vault.",
+      "x-vault-unauthenticated": true,
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/role": {
+      "description": "Lists all the roles that are registered with Vault.",
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "parameters": [
+          {
+            "name": "list",
+            "description": "Must be set to `true`",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true"
+              ]
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/role/{role}": {
+      "description": "Create a role and associate policies to it.",
+      "parameters": [
+        {
+          "name": "role",
+          "description": "Name of the role.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "x-vault-createSupported": true,
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "empty body"
+          }
+        }
+      }
+    },
+    "/role/{role}/tag": {
+      "description": "Create a tag on a role in order to be able to further restrict the capabilities of a role.",
+      "parameters": [
+        {
+          "name": "role",
+          "description": "Name of the role.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleTagRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/roles": {
+      "description": "Lists all the roles that are registered with Vault.",
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "parameters": [
+          {
+            "name": "list",
+            "description": "Must be set to `true`",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true"
+              ]
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/roletag-blacklist": {
+      "description": "Lists the deny list role tags.",
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "parameters": [
+          {
+            "name": "list",
+            "description": "Must be set to `true`",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true"
+              ]
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/roletag-blacklist/{role_tag}": {
+      "description": "Blacklist a previously created role tag.",
+      "parameters": [
+        {
+          "name": "role_tag",
+          "description": "Role tag to be deny listed. The tag can be supplied as-is. In order to avoid any encoding problems, it can be base64 encoded.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "empty body"
+          }
+        }
+      }
+    },
+    "/roletag-denylist": {
+      "description": "Lists the deny list role tags.",
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "parameters": [
+          {
+            "name": "list",
+            "description": "Must be set to `true`",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true"
+              ]
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/roletag-denylist/{role_tag}": {
+      "description": "Blacklist a previously created role tag.",
+      "parameters": [
+        {
+          "name": "role_tag",
+          "description": "Role tag to be deny listed. The tag can be supplied as-is. In order to avoid any encoding problems, it can be base64 encoded.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "empty body"
+          }
+        }
+      }
+    },
+    "/tidy/identity-accesslist": {
+      "description": "Clean-up the access list instance identity entries.",
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TidyIdentityAccesslistRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/tidy/identity-whitelist": {
+      "description": "Clean-up the access list instance identity entries.",
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TidyIdentityWhitelistRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/tidy/roletag-blacklist": {
+      "description": "Clean-up the deny list role tag entries.",
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TidyRoletagBlacklistRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/tidy/roletag-denylist": {
+      "description": "Clean-up the deny list role tag entries.",
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TidyRoletagDenylistRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ConfigCertificateRequest": {
+        "type": "object",
+        "properties": {
+          "aws_public_cert": {
+            "type": "string",
+            "description": "Base64 encoded AWS Public cert required to verify PKCS7 signature of the EC2 instance metadata."
+          },
+          "type": {
+            "type": "string",
+            "description": "Takes the value of either \"pkcs7\" or \"identity\", indicating the type of document which can be verified using the given certificate. The reason is that the PKCS#7 document will have a DSA digest and the identity signature will have an RSA signature, and accordingly the public certificates to verify those also vary. Defaults to \"pkcs7\".",
+            "default": "pkcs7"
+          }
+        }
+      },
+      "ConfigClientRequest": {
+        "type": "object",
+        "properties": {
+          "access_key": {
+            "type": "string",
+            "description": "AWS Access Key ID for the account used to make AWS API requests.",
+            "default": ""
+          },
+          "allowed_sts_header_values": {
+            "type": "array",
+            "description": "List of additional headers that are allowed to be in AWS STS request headers",
+            "items": {
+              "type": "string"
+            }
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "URL to override the default generated endpoint for making AWS EC2 API calls.",
+            "default": ""
+          },
+          "iam_endpoint": {
+            "type": "string",
+            "description": "URL to override the default generated endpoint for making AWS IAM API calls.",
+            "default": ""
+          },
+          "iam_server_id_header_value": {
+            "type": "string",
+            "description": "Value to require in the X-Vault-AWS-IAM-Server-ID request header",
+            "default": ""
+          },
+          "max_retries": {
+            "type": "integer",
+            "description": "Maximum number of retries for recoverable exceptions of AWS APIs",
+            "default": -1
+          },
+          "secret_key": {
+            "type": "string",
+            "description": "AWS Secret Access Key for the account used to make AWS API requests.",
+            "default": ""
+          },
+          "sts_endpoint": {
+            "type": "string",
+            "description": "URL to override the default generated endpoint for making AWS STS API calls.",
+            "default": ""
+          },
+          "sts_region": {
+            "type": "string",
+            "description": "The region ID for the sts_endpoint, if set.",
+            "default": ""
+          }
+        }
+      },
+      "ConfigIdentityRequest": {
+        "type": "object",
+        "properties": {
+          "ec2_alias": {
+            "type": "string",
+            "description": "Configure how the AWS auth method generates entity alias when using EC2 auth. Valid values are \"role_id\", \"instance_id\", and \"image_id\". Defaults to \"role_id\".",
+            "default": "instance_id"
+          },
+          "ec2_metadata": {
+            "type": "array",
+            "description": "The metadata to include on the aliases and audit logs generated by this plugin. When set to 'default', includes: account_id, auth_type. These fields are available to add: ami_id, instance_id, region. Not editing this field means the 'default' fields are included. Explicitly setting this field to empty overrides the 'default' and means no metadata will be included. If not using 'default', explicit fields must be sent like: 'field1,field2'.",
+            "items": {
+              "type": "string"
+            },
+            "default": [
+              "default"
+            ],
+            "x-vault-displayAttrs": {
+              "name": "ec2_metadata",
+              "value": "field1,field2"
+            }
+          },
+          "iam_alias": {
+            "type": "string",
+            "description": "Configure how the AWS auth method generates entity aliases when using IAM auth. Valid values are \"role_id\", \"unique_id\", and \"full_arn\". Defaults to \"role_id\".",
+            "default": "unique_id"
+          },
+          "iam_metadata": {
+            "type": "array",
+            "description": "The metadata to include on the aliases and audit logs generated by this plugin. When set to 'default', includes: account_id, auth_type. These fields are available to add: canonical_arn, client_arn, client_user_id, inferred_aws_region, inferred_entity_id, inferred_entity_type. Not editing this field means the 'default' fields are included. Explicitly setting this field to empty overrides the 'default' and means no metadata will be included. If not using 'default', explicit fields must be sent like: 'field1,field2'.",
+            "items": {
+              "type": "string"
+            },
+            "default": [
+              "default"
+            ],
+            "x-vault-displayAttrs": {
+              "name": "iam_metadata",
+              "value": "field1,field2"
+            }
+          }
+        }
+      },
+      "ConfigStsRequest": {
+        "type": "object",
+        "properties": {
+          "sts_role": {
+            "type": "string",
+            "description": "AWS ARN for STS role to be assumed when interacting with the account specified. The Vault server must have permissions to assume this role."
+          }
+        }
+      },
+      "ConfigTidyIdentityAccesslistRequest": {
+        "type": "object",
+        "properties": {
+          "disable_periodic_tidy": {
+            "type": "boolean",
+            "description": "If set to 'true', disables the periodic tidying of the 'identity-accesslist/<instance_id>' entries.",
+            "default": false
+          },
+          "safety_buffer": {
+            "type": "integer",
+            "description": "The amount of extra time that must have passed beyond the identity's expiration, before it is removed from the backend storage.",
+            "format": "seconds",
+            "default": 259200
+          }
+        }
+      },
+      "ConfigTidyIdentityWhitelistRequest": {
+        "type": "object",
+        "properties": {
+          "disable_periodic_tidy": {
+            "type": "boolean",
+            "description": "If set to 'true', disables the periodic tidying of the 'identity-accesslist/<instance_id>' entries.",
+            "default": false
+          },
+          "safety_buffer": {
+            "type": "integer",
+            "description": "The amount of extra time that must have passed beyond the identity's expiration, before it is removed from the backend storage.",
+            "format": "seconds",
+            "default": 259200
+          }
+        }
+      },
+      "ConfigTidyRoletagBlacklistRequest": {
+        "type": "object",
+        "properties": {
+          "disable_periodic_tidy": {
+            "type": "boolean",
+            "description": "If set to 'true', disables the periodic tidying of deny listed entries.",
+            "default": false
+          },
+          "safety_buffer": {
+            "type": "integer",
+            "description": "The amount of extra time that must have passed beyond the roletag expiration, before it is removed from the backend storage. Defaults to 4320h (180 days).",
+            "format": "seconds",
+            "default": 15552000
+          }
+        }
+      },
+      "ConfigTidyRoletagDenylistRequest": {
+        "type": "object",
+        "properties": {
+          "disable_periodic_tidy": {
+            "type": "boolean",
+            "description": "If set to 'true', disables the periodic tidying of deny listed entries.",
+            "default": false
+          },
+          "safety_buffer": {
+            "type": "integer",
+            "description": "The amount of extra time that must have passed beyond the roletag expiration, before it is removed from the backend storage. Defaults to 4320h (180 days).",
+            "format": "seconds",
+            "default": 15552000
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "iam_http_request_method": {
+            "type": "string",
+            "description": "HTTP method to use for the AWS request when auth_type is iam. This must match what has been signed in the presigned request. Currently, POST is the only supported value"
+          },
+          "iam_request_body": {
+            "type": "string",
+            "description": "Base64-encoded request body when auth_type is iam. This must match the request body included in the signature."
+          },
+          "iam_request_headers": {
+            "type": "string",
+            "description": "Key/value pairs of headers for use in the sts:GetCallerIdentity HTTP requests headers when auth_type is iam. Can be either a Base64-encoded, JSON-serialized string, or a JSON object of key/value pairs. This must at a minimum include the headers over which AWS has included a signature."
+          },
+          "iam_request_url": {
+            "type": "string",
+            "description": "Base64-encoded full URL against which to make the AWS request when using iam auth_type."
+          },
+          "identity": {
+            "type": "string",
+            "description": "Base64 encoded EC2 instance identity document. This needs to be supplied along with the 'signature' parameter. If using 'curl' for fetching the identity document, consider using the option '-w 0' while piping the output to 'base64' binary."
+          },
+          "nonce": {
+            "type": "string",
+            "description": "The nonce to be used for subsequent login requests when auth_type is ec2. If this parameter is not specified at all and if reauthentication is allowed, then the backend will generate a random nonce, attaches it to the instance's identity access list entry and returns the nonce back as part of auth metadata. This value should be used with further login requests, to establish client authenticity. Clients can choose to set a custom nonce if preferred, in which case, it is recommended that clients provide a strong nonce. If a nonce is provided but with an empty value, it indicates intent to disable reauthentication. Note that, when 'disallow_reauthentication' option is enabled on either the role or the role tag, the 'nonce' holds no significance."
+          },
+          "pkcs7": {
+            "type": "string",
+            "description": "PKCS7 signature of the identity document when using an auth_type of ec2."
+          },
+          "role": {
+            "type": "string",
+            "description": "Name of the role against which the login is being attempted. If 'role' is not specified, then the login endpoint looks for a role bearing the name of the AMI ID of the EC2 instance that is trying to login. If a matching role is not found, login fails."
+          },
+          "signature": {
+            "type": "string",
+            "description": "Base64 encoded SHA256 RSA signature of the instance identity document. This needs to be supplied along with 'identity' parameter."
+          }
+        }
+      },
+      "RoleRequest": {
+        "type": "object",
+        "properties": {
+          "allow_instance_migration": {
+            "type": "boolean",
+            "description": "If set, allows migration of the underlying instance where the client resides. This keys off of pendingTime in the metadata document, so essentially, this disables the client nonce check whenever the instance is migrated to a new host and pendingTime is newer than the previously-remembered time. Use with caution. This is only checked when auth_type is ec2.",
+            "default": false
+          },
+          "auth_type": {
+            "type": "string",
+            "description": "The auth_type permitted to authenticate to this role. Must be one of iam or ec2 and cannot be changed after role creation."
+          },
+          "bound_account_id": {
+            "type": "array",
+            "description": "If set, defines a constraint on the EC2 instances that the account ID in its identity document to match one of the IDs specified by this parameter. This is only applicable when auth_type is ec2 or inferred_entity_type is ec2_instance.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "bound_ami_id": {
+            "type": "array",
+            "description": "If set, defines a constraint on the EC2 instances that they should be using one of the AMI IDs specified by this parameter. This is only applicable when auth_type is ec2 or inferred_entity_type is ec2_instance.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "bound_ec2_instance_id": {
+            "type": "array",
+            "description": "If set, defines a constraint on the EC2 instances to have one of the given instance IDs. Can be a list or comma-separated string of EC2 instance IDs. This is only applicable when auth_type is ec2 or inferred_entity_type is ec2_instance.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "bound_iam_instance_profile_arn": {
+            "type": "array",
+            "description": "If set, defines a constraint on the EC2 instances to be associated with an IAM instance profile ARN which has a prefix that matches one of the values specified by this parameter. The value is prefix-matched (as though it were a glob ending in '*'). This is only applicable when auth_type is ec2 or inferred_entity_type is ec2_instance.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "bound_iam_principal_arn": {
+            "type": "array",
+            "description": "ARN of the IAM principals to bind to this role. Only applicable when auth_type is iam.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "bound_iam_role_arn": {
+            "type": "array",
+            "description": "If set, defines a constraint on the authenticating EC2 instance that it must match one of the IAM role ARNs specified by this parameter. The value is prefix-matched (as though it were a glob ending in '*'). The configured IAM user or EC2 instance role must be allowed to execute the 'iam:GetInstanceProfile' action if this is specified. This is only applicable when auth_type is ec2 or inferred_entity_type is ec2_instance.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "bound_region": {
+            "type": "array",
+            "description": "If set, defines a constraint on the EC2 instances that the region in its identity document match one of the regions specified by this parameter. This is only applicable when auth_type is ec2.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "bound_subnet_id": {
+            "type": "array",
+            "description": "If set, defines a constraint on the EC2 instance to be associated with the subnet ID that matches one of the values specified by this parameter. This is only applicable when auth_type is ec2 or inferred_entity_type is ec2_instance.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "bound_vpc_id": {
+            "type": "array",
+            "description": "If set, defines a constraint on the EC2 instance to be associated with a VPC ID that matches one of the value specified by this parameter. This is only applicable when auth_type is ec2 or inferred_entity_type is ec2_instance.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "disallow_reauthentication": {
+            "type": "boolean",
+            "description": "If set, only allows a single token to be granted per instance ID. In order to perform a fresh login, the entry in the access list for the instance ID needs to be cleared using 'auth/aws-ec2/identity-accesslist/<instance_id>' endpoint. This is only applicable when auth_type is ec2.",
+            "default": false
+          },
+          "inferred_aws_region": {
+            "type": "string",
+            "description": "When auth_type is iam and inferred_entity_type is set, the region to assume the inferred entity exists in."
+          },
+          "inferred_entity_type": {
+            "type": "string",
+            "description": "When auth_type is iam, the AWS entity type to infer from the authenticated principal. The only supported value is ec2_instance, which will extract the EC2 instance ID from the authenticated role and apply the following restrictions specific to EC2 instances: bound_ami_id, bound_account_id, bound_iam_role_arn, bound_iam_instance_profile_arn, bound_vpc_id, bound_subnet_id. The configured EC2 client must be able to find the inferred instance ID in the results, and the instance must be running. If unable to determine the EC2 instance ID or unable to find the EC2 instance ID among running instances, then authentication will fail."
+          },
+          "max_ttl": {
+            "type": "integer",
+            "description": "Use \"token_max_ttl\" instead. If this and \"token_max_ttl\" are both specified, only \"token_max_ttl\" will be used.",
+            "format": "seconds",
+            "deprecated": true
+          },
+          "period": {
+            "type": "integer",
+            "description": "Use \"token_period\" instead. If this and \"token_period\" are both specified, only \"token_period\" will be used.",
+            "format": "seconds",
+            "deprecated": true
+          },
+          "policies": {
+            "type": "array",
+            "description": "Use \"token_policies\" instead. If this and \"token_policies\" are both specified, only \"token_policies\" will be used.",
+            "items": {
+              "type": "string"
+            },
+            "deprecated": true
+          },
+          "resolve_aws_unique_ids": {
+            "type": "boolean",
+            "description": "If set, resolve all AWS IAM ARNs into AWS's internal unique IDs. When an IAM entity (e.g., user, role, or instance profile) is deleted, then all references to it within the role will be invalidated, which prevents a new IAM entity from being created with the same name and matching the role's IAM binds. Once set, this cannot be unset.",
+            "default": true
+          },
+          "role_tag": {
+            "type": "string",
+            "description": "If set, enables the role tags for this role. The value set for this field should be the 'key' of the tag on the EC2 instance. The 'value' of the tag should be generated using 'role/<role>/tag' endpoint. Defaults to an empty string, meaning that role tags are disabled. This is only allowed if auth_type is ec2.",
+            "default": ""
+          },
+          "token_bound_cidrs": {
+            "type": "array",
+            "description": "Comma separated string or JSON list of CIDR blocks. If set, specifies the blocks of IP addresses which are allowed to use the generated token.",
+            "items": {
+              "type": "string"
+            },
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Bound CIDRs",
+              "group": "Tokens"
+            }
+          },
+          "token_explicit_max_ttl": {
+            "type": "integer",
+            "description": "If set, tokens created via this role carry an explicit maximum TTL. During renewal, the current maximum TTL values of the role and the mount are not checked for changes, and any updates to these values will have no effect on the token being renewed.",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Explicit Maximum TTL",
+              "group": "Tokens"
+            }
+          },
+          "token_max_ttl": {
+            "type": "integer",
+            "description": "The maximum lifetime of the generated token",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Maximum TTL",
+              "group": "Tokens"
+            }
+          },
+          "token_no_default_policy": {
+            "type": "boolean",
+            "description": "If true, the 'default' policy will not automatically be added to generated tokens",
+            "x-vault-displayAttrs": {
+              "name": "Do Not Attach 'default' Policy To Generated Tokens",
+              "group": "Tokens"
+            }
+          },
+          "token_num_uses": {
+            "type": "integer",
+            "description": "The maximum number of times a token may be used, a value of zero means unlimited",
+            "x-vault-displayAttrs": {
+              "name": "Maximum Uses of Generated Tokens",
+              "group": "Tokens"
+            }
+          },
+          "token_period": {
+            "type": "integer",
+            "description": "If set, tokens created via this role will have no max lifetime; instead, their renewal period will be fixed to this value. This takes an integer number of seconds, or a string duration (e.g. \"24h\").",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Period",
+              "group": "Tokens"
+            }
+          },
+          "token_policies": {
+            "type": "array",
+            "description": "Comma-separated list of policies",
+            "items": {
+              "type": "string"
+            },
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Policies",
+              "group": "Tokens"
+            }
+          },
+          "token_ttl": {
+            "type": "integer",
+            "description": "The initial ttl of the token to generate",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Initial TTL",
+              "group": "Tokens"
+            }
+          },
+          "token_type": {
+            "type": "string",
+            "description": "The type of token to generate, service or batch",
+            "default": "default-service",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Type",
+              "group": "Tokens"
+            }
+          },
+          "ttl": {
+            "type": "integer",
+            "description": "Use \"token_ttl\" instead. If this and \"token_ttl\" are both specified, only \"token_ttl\" will be used.",
+            "format": "seconds",
+            "deprecated": true
+          }
+        }
+      },
+      "RoleTagRequest": {
+        "type": "object",
+        "properties": {
+          "allow_instance_migration": {
+            "type": "boolean",
+            "description": "If set, allows migration of the underlying instance where the client resides. This keys off of pendingTime in the metadata document, so essentially, this disables the client nonce check whenever the instance is migrated to a new host and pendingTime is newer than the previously-remembered time. Use with caution.",
+            "default": false
+          },
+          "disallow_reauthentication": {
+            "type": "boolean",
+            "description": "If set, only allows a single token to be granted per instance ID. In order to perform a fresh login, the entry in access list for the instance ID needs to be cleared using the 'auth/aws-ec2/identity-accesslist/<instance_id>' endpoint.",
+            "default": false
+          },
+          "instance_id": {
+            "type": "string",
+            "description": "Instance ID for which this tag is intended for. If set, the created tag can only be used by the instance with the given ID."
+          },
+          "max_ttl": {
+            "type": "integer",
+            "description": "If set, specifies the maximum allowed token lifetime.",
+            "format": "seconds",
+            "default": 0
+          },
+          "policies": {
+            "type": "array",
+            "description": "Policies to be associated with the tag. If set, must be a subset of the role's policies. If set, but set to an empty value, only the 'default' policy will be given to issued tokens.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "TidyIdentityAccesslistRequest": {
+        "type": "object",
+        "properties": {
+          "safety_buffer": {
+            "type": "integer",
+            "description": "The amount of extra time that must have passed beyond the identity's expiration, before it is removed from the backend storage.",
+            "format": "seconds",
+            "default": 259200
+          }
+        }
+      },
+      "TidyIdentityWhitelistRequest": {
+        "type": "object",
+        "properties": {
+          "safety_buffer": {
+            "type": "integer",
+            "description": "The amount of extra time that must have passed beyond the identity's expiration, before it is removed from the backend storage.",
+            "format": "seconds",
+            "default": 259200
+          }
+        }
+      },
+      "TidyRoletagBlacklistRequest": {
+        "type": "object",
+        "properties": {
+          "safety_buffer": {
+            "type": "integer",
+            "description": "The amount of extra time that must have passed beyond the roletag expiration, before it is removed from the backend storage.",
+            "format": "seconds",
+            "default": 259200
+          }
+        }
+      },
+      "TidyRoletagDenylistRequest": {
+        "type": "object",
+        "properties": {
+          "safety_buffer": {
+            "type": "integer",
+            "description": "The amount of extra time that must have passed beyond the roletag expiration, before it is removed from the backend storage.",
+            "format": "seconds",
+            "default": 259200
+          }
+        }
+      }
+    }
+  }
+}

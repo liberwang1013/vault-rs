@@ -1,0 +1,1877 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "HashiCorp Vault API",
+    "description": "HTTP API that gives you full access to Vault. All API routes are prefixed with `/v1/`.",
+    "version": "1.13.0",
+    "license": {
+      "name": "Mozilla Public License 2.0",
+      "url": "https://www.mozilla.org/en-US/MPL/2.0"
+    }
+  },
+  "paths": {
+    "/login": {
+      "description": "Issue a token based on the credentials supplied",
+      "x-vault-unauthenticated": true,
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/role": {
+      "description": "Lists all the roles registered with the backend.",
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "parameters": [
+          {
+            "name": "list",
+            "description": "Must be set to `true`",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true"
+              ]
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/role/{role_name}": {
+      "description": "Register an role with the backend.",
+      "parameters": [
+        {
+          "name": "role_name",
+          "description": "Name of the role. Must be less than 4096 bytes.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "x-vault-createSupported": true,
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/role/{role_name}/bind-secret-id": {
+      "description": "Impose secret_id to be presented during login using this role.",
+      "parameters": [
+        {
+          "name": "role_name",
+          "description": "Name of the role. Must be less than 4096 bytes.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleBindSecretIdResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleBindSecretIdRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/role/{role_name}/bound-cidr-list": {
+      "description": "Deprecated: Comma separated list of CIDR blocks, if set, specifies blocks of IP addresses which can perform the login operation",
+      "parameters": [
+        {
+          "name": "role_name",
+          "description": "Name of the role. Must be less than 4096 bytes.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleBoundCidrListResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleBoundCidrListRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/role/{role_name}/custom-secret-id": {
+      "description": "Assign a SecretID of choice against the role.",
+      "parameters": [
+        {
+          "name": "role_name",
+          "description": "Name of the role. Must be less than 4096 bytes.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleCustomSecretIdRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleCustomSecretIdResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/role/{role_name}/local-secret-ids": {
+      "description": "Enables cluster local secret IDs",
+      "parameters": [
+        {
+          "name": "role_name",
+          "description": "Name of the role. Must be less than 4096 bytes.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleLocalSecretIdsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/role/{role_name}/period": {
+      "description": "Updates the value of 'period' on the role",
+      "parameters": [
+        {
+          "name": "role_name",
+          "description": "Name of the role. Must be less than 4096 bytes.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RolePeriodResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RolePeriodRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/role/{role_name}/policies": {
+      "description": "Policies of the role.",
+      "parameters": [
+        {
+          "name": "role_name",
+          "description": "Name of the role. Must be less than 4096 bytes.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RolePoliciesResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RolePoliciesRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/role/{role_name}/role-id": {
+      "description": "Returns the 'role_id' of the role.",
+      "parameters": [
+        {
+          "name": "role_name",
+          "description": "Name of the role. Must be less than 4096 bytes.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleRoleIdResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleRoleIdRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/role/{role_name}/secret-id": {
+      "description": "Generate a SecretID against this role.",
+      "parameters": [
+        {
+          "name": "role_name",
+          "description": "Name of the role. Must be less than 4096 bytes.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "parameters": [
+          {
+            "name": "list",
+            "description": "Must be set to `true`",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true"
+              ]
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleSecretIdResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleSecretIdRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleSecretIdResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/role/{role_name}/secret-id-accessor/destroy": {
+      "parameters": [
+        {
+          "name": "role_name",
+          "description": "Name of the role. Must be less than 4096 bytes.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleSecretIdAccessorDestroyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/role/{role_name}/secret-id-accessor/lookup": {
+      "parameters": [
+        {
+          "name": "role_name",
+          "description": "Name of the role. Must be less than 4096 bytes.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleSecretIdAccessorLookupRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleSecretIdAccessorLookupResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/role/{role_name}/secret-id-bound-cidrs": {
+      "description": "Comma separated list of CIDR blocks, if set, specifies blocks of IP addresses which can perform the login operation",
+      "parameters": [
+        {
+          "name": "role_name",
+          "description": "Name of the role. Must be less than 4096 bytes.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleSecretIdBoundCidrsResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleSecretIdBoundCidrsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/role/{role_name}/secret-id-num-uses": {
+      "description": "Use limit of the SecretID generated against the role.",
+      "parameters": [
+        {
+          "name": "role_name",
+          "description": "Name of the role. Must be less than 4096 bytes.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleSecretIdNumUsesResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleSecretIdNumUsesRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/role/{role_name}/secret-id-ttl": {
+      "description": "Duration in seconds of the SecretID generated against the role.",
+      "parameters": [
+        {
+          "name": "role_name",
+          "description": "Name of the role. Must be less than 4096 bytes.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleSecretIdTtlResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleSecretIdTtlRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/role/{role_name}/secret-id/destroy": {
+      "description": "Invalidate an issued secret_id",
+      "parameters": [
+        {
+          "name": "role_name",
+          "description": "Name of the role. Must be less than 4096 bytes.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleSecretIdDestroyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/role/{role_name}/secret-id/lookup": {
+      "description": "Read the properties of an issued secret_id",
+      "parameters": [
+        {
+          "name": "role_name",
+          "description": "Name of the role. Must be less than 4096 bytes.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleSecretIdLookupRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleSecretIdLookupResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/role/{role_name}/token-bound-cidrs": {
+      "description": "Comma separated string or list of CIDR blocks. If set, specifies the blocks of IP addresses which can use the returned token.",
+      "parameters": [
+        {
+          "name": "role_name",
+          "description": "Name of the role. Must be less than 4096 bytes.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleTokenBoundCidrsResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleTokenBoundCidrsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/role/{role_name}/token-max-ttl": {
+      "description": "Duration in seconds, the maximum lifetime of the tokens issued by using the SecretIDs that were generated against this role, after which the tokens are not allowed to be renewed.",
+      "parameters": [
+        {
+          "name": "role_name",
+          "description": "Name of the role. Must be less than 4096 bytes.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleTokenMaxTtlResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleTokenMaxTtlRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/role/{role_name}/token-num-uses": {
+      "description": "Number of times issued tokens can be used",
+      "parameters": [
+        {
+          "name": "role_name",
+          "description": "Name of the role. Must be less than 4096 bytes.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleTokenNumUsesResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleTokenNumUsesRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/role/{role_name}/token-ttl": {
+      "description": "Duration in seconds, the lifetime of the token issued by using the SecretID that is generated against this role, before which the token needs to be renewed.",
+      "parameters": [
+        {
+          "name": "role_name",
+          "description": "Name of the role. Must be less than 4096 bytes.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleTokenTtlResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleTokenTtlRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/tidy/secret-id": {
+      "description": "Trigger the clean-up of expired SecretID entries.",
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "202": {
+            "description": "Accepted"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "role_id": {
+            "type": "string",
+            "description": "Unique identifier of the Role. Required to be supplied when the 'bind_secret_id' constraint is set."
+          },
+          "secret_id": {
+            "type": "string",
+            "description": "SecretID belong to the App role",
+            "default": ""
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string"
+          }
+        }
+      },
+      "RoleBindSecretIdRequest": {
+        "type": "object",
+        "properties": {
+          "bind_secret_id": {
+            "type": "boolean",
+            "description": "Impose secret_id to be presented when logging in using this role.",
+            "default": true
+          }
+        }
+      },
+      "RoleBindSecretIdResponse": {
+        "type": "object",
+        "properties": {
+          "bind_secret_id": {
+            "type": "boolean",
+            "description": "Impose secret_id to be presented when logging in using this role. Defaults to 'true'."
+          }
+        }
+      },
+      "RoleBoundCidrListRequest": {
+        "type": "object",
+        "properties": {
+          "bound_cidr_list": {
+            "type": "array",
+            "description": "Deprecated: Please use \"secret_id_bound_cidrs\" instead. Comma separated string or list of CIDR blocks. If set, specifies the blocks of IP addresses which can perform the login operation.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "RoleBoundCidrListResponse": {
+        "type": "object",
+        "properties": {
+          "bound_cidr_list": {
+            "type": "array",
+            "description": "Deprecated: Please use \"secret_id_bound_cidrs\" instead. Comma separated string or list of CIDR blocks. If set, specifies the blocks of IP addresses which can perform the login operation.",
+            "items": {
+              "type": "string"
+            },
+            "deprecated": true
+          }
+        }
+      },
+      "RoleCustomSecretIdRequest": {
+        "type": "object",
+        "properties": {
+          "cidr_list": {
+            "type": "array",
+            "description": "Comma separated string or list of CIDR blocks enforcing secret IDs to be used from specific set of IP addresses. If 'bound_cidr_list' is set on the role, then the list of CIDR blocks listed here should be a subset of the CIDR blocks listed on the role.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "metadata": {
+            "type": "string",
+            "description": "Metadata to be tied to the SecretID. This should be a JSON formatted string containing metadata in key value pairs."
+          },
+          "num_uses": {
+            "type": "integer",
+            "description": "Number of times this SecretID can be used, after which the SecretID expires. Overrides secret_id_num_uses role option when supplied. May not be higher than role's secret_id_num_uses."
+          },
+          "secret_id": {
+            "type": "string",
+            "description": "SecretID to be attached to the role."
+          },
+          "token_bound_cidrs": {
+            "type": "array",
+            "description": "Comma separated string or list of CIDR blocks. If set, specifies the blocks of IP addresses which can use the returned token. Should be a subset of the token CIDR blocks listed on the role, if any.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "ttl": {
+            "type": "integer",
+            "description": "Duration in seconds after which this SecretID expires. Overrides secret_id_ttl role option when supplied. May not be longer than role's secret_id_ttl.",
+            "format": "seconds"
+          }
+        }
+      },
+      "RoleCustomSecretIdResponse": {
+        "type": "object",
+        "properties": {
+          "secret_id": {
+            "type": "string",
+            "description": "Secret ID attached to the role."
+          },
+          "secret_id_accessor": {
+            "type": "string",
+            "description": "Accessor of the secret ID"
+          },
+          "secret_id_num_uses": {
+            "type": "integer",
+            "description": "Number of times a secret ID can access the role, after which the secret ID will expire."
+          },
+          "secret_id_ttl": {
+            "type": "integer",
+            "description": "Duration in seconds after which the issued secret ID expires.",
+            "format": "seconds"
+          }
+        }
+      },
+      "RoleLocalSecretIdsResponse": {
+        "type": "object",
+        "properties": {
+          "local_secret_ids": {
+            "type": "boolean",
+            "description": "If true, the secret identifiers generated using this role will be cluster local. This can only be set during role creation and once set, it can't be reset later"
+          }
+        }
+      },
+      "RolePeriodRequest": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "type": "integer",
+            "description": "Use \"token_period\" instead. If this and \"token_period\" are both specified, only \"token_period\" will be used.",
+            "format": "seconds",
+            "deprecated": true
+          },
+          "token_period": {
+            "type": "integer",
+            "description": "If set, tokens created via this role will have no max lifetime; instead, their renewal period will be fixed to this value. This takes an integer number of seconds, or a string duration (e.g. \"24h\").",
+            "format": "seconds"
+          }
+        }
+      },
+      "RolePeriodResponse": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "type": "integer",
+            "description": "Use \"token_period\" instead. If this and \"token_period\" are both specified, only \"token_period\" will be used.",
+            "format": "seconds",
+            "deprecated": true
+          },
+          "token_period": {
+            "type": "integer",
+            "description": "If set, tokens created via this role will have no max lifetime; instead, their renewal period will be fixed to this value. This takes an integer number of seconds, or a string duration (e.g. \"24h\").",
+            "format": "seconds"
+          }
+        }
+      },
+      "RolePoliciesRequest": {
+        "type": "object",
+        "properties": {
+          "policies": {
+            "type": "array",
+            "description": "Use \"token_policies\" instead. If this and \"token_policies\" are both specified, only \"token_policies\" will be used.",
+            "items": {
+              "type": "string"
+            },
+            "deprecated": true
+          },
+          "token_policies": {
+            "type": "array",
+            "description": "Comma-separated list of policies",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "RolePoliciesResponse": {
+        "type": "object",
+        "properties": {
+          "policies": {
+            "type": "array",
+            "description": "Use \"token_policies\" instead. If this and \"token_policies\" are both specified, only \"token_policies\" will be used.",
+            "items": {
+              "type": "string"
+            },
+            "deprecated": true
+          },
+          "token_policies": {
+            "type": "array",
+            "description": "Comma-separated list of policies",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "RoleRequest": {
+        "type": "object",
+        "properties": {
+          "bind_secret_id": {
+            "type": "boolean",
+            "description": "Impose secret_id to be presented when logging in using this role. Defaults to 'true'.",
+            "default": true
+          },
+          "bound_cidr_list": {
+            "type": "array",
+            "description": "Use \"secret_id_bound_cidrs\" instead.",
+            "items": {
+              "type": "string"
+            },
+            "deprecated": true
+          },
+          "local_secret_ids": {
+            "type": "boolean",
+            "description": "If set, the secret IDs generated using this role will be cluster local. This can only be set during role creation and once set, it can't be reset later."
+          },
+          "period": {
+            "type": "integer",
+            "description": "Use \"token_period\" instead. If this and \"token_period\" are both specified, only \"token_period\" will be used.",
+            "format": "seconds",
+            "deprecated": true
+          },
+          "policies": {
+            "type": "array",
+            "description": "Use \"token_policies\" instead. If this and \"token_policies\" are both specified, only \"token_policies\" will be used.",
+            "items": {
+              "type": "string"
+            },
+            "deprecated": true
+          },
+          "role_id": {
+            "type": "string",
+            "description": "Identifier of the role. Defaults to a UUID."
+          },
+          "secret_id_bound_cidrs": {
+            "type": "array",
+            "description": "Comma separated string or list of CIDR blocks. If set, specifies the blocks of IP addresses which can perform the login operation.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "secret_id_num_uses": {
+            "type": "integer",
+            "description": "Number of times a SecretID can access the role, after which the SecretID will expire. Defaults to 0 meaning that the the secret_id is of unlimited use."
+          },
+          "secret_id_ttl": {
+            "type": "integer",
+            "description": "Duration in seconds after which the issued SecretID should expire. Defaults to 0, meaning no expiration.",
+            "format": "seconds"
+          },
+          "token_bound_cidrs": {
+            "type": "array",
+            "description": "Comma separated string or JSON list of CIDR blocks. If set, specifies the blocks of IP addresses which are allowed to use the generated token.",
+            "items": {
+              "type": "string"
+            },
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Bound CIDRs",
+              "group": "Tokens"
+            }
+          },
+          "token_explicit_max_ttl": {
+            "type": "integer",
+            "description": "If set, tokens created via this role carry an explicit maximum TTL. During renewal, the current maximum TTL values of the role and the mount are not checked for changes, and any updates to these values will have no effect on the token being renewed.",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Explicit Maximum TTL",
+              "group": "Tokens"
+            }
+          },
+          "token_max_ttl": {
+            "type": "integer",
+            "description": "The maximum lifetime of the generated token",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Maximum TTL",
+              "group": "Tokens"
+            }
+          },
+          "token_no_default_policy": {
+            "type": "boolean",
+            "description": "If true, the 'default' policy will not automatically be added to generated tokens",
+            "x-vault-displayAttrs": {
+              "name": "Do Not Attach 'default' Policy To Generated Tokens",
+              "group": "Tokens"
+            }
+          },
+          "token_num_uses": {
+            "type": "integer",
+            "description": "The maximum number of times a token may be used, a value of zero means unlimited",
+            "x-vault-displayAttrs": {
+              "name": "Maximum Uses of Generated Tokens",
+              "group": "Tokens"
+            }
+          },
+          "token_period": {
+            "type": "integer",
+            "description": "If set, tokens created via this role will have no max lifetime; instead, their renewal period will be fixed to this value. This takes an integer number of seconds, or a string duration (e.g. \"24h\").",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Period",
+              "group": "Tokens"
+            }
+          },
+          "token_policies": {
+            "type": "array",
+            "description": "Comma-separated list of policies",
+            "items": {
+              "type": "string"
+            },
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Policies",
+              "group": "Tokens"
+            }
+          },
+          "token_ttl": {
+            "type": "integer",
+            "description": "The initial ttl of the token to generate",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Initial TTL",
+              "group": "Tokens"
+            }
+          },
+          "token_type": {
+            "type": "string",
+            "description": "The type of token to generate, service or batch",
+            "default": "default-service",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Type",
+              "group": "Tokens"
+            }
+          }
+        }
+      },
+      "RoleResponse": {
+        "type": "object",
+        "properties": {
+          "keys": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "RoleRoleIdRequest": {
+        "type": "object",
+        "properties": {
+          "role_id": {
+            "type": "string",
+            "description": "Identifier of the role. Defaults to a UUID."
+          }
+        }
+      },
+      "RoleRoleIdResponse": {
+        "type": "object",
+        "properties": {
+          "role_id": {
+            "type": "string",
+            "description": "Identifier of the role. Defaults to a UUID."
+          }
+        }
+      },
+      "RoleSecretIdAccessorDestroyRequest": {
+        "type": "object",
+        "properties": {
+          "secret_id_accessor": {
+            "type": "string",
+            "description": "Accessor of the SecretID"
+          }
+        }
+      },
+      "RoleSecretIdAccessorLookupRequest": {
+        "type": "object",
+        "properties": {
+          "secret_id_accessor": {
+            "type": "string",
+            "description": "Accessor of the SecretID"
+          }
+        }
+      },
+      "RoleSecretIdAccessorLookupResponse": {
+        "type": "object",
+        "properties": {
+          "cidr_list": {
+            "type": "array",
+            "description": "List of CIDR blocks enforcing secret IDs to be used from specific set of IP addresses. If 'bound_cidr_list' is set on the role, then the list of CIDR blocks listed here should be a subset of the CIDR blocks listed on the role.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "creation_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiration_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "last_updated_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "metadata": {
+            "type": "object",
+            "format": "kvpairs"
+          },
+          "secret_id_accessor": {
+            "type": "string",
+            "description": "Accessor of the secret ID"
+          },
+          "secret_id_num_uses": {
+            "type": "integer",
+            "description": "Number of times a secret ID can access the role, after which the secret ID will expire."
+          },
+          "secret_id_ttl": {
+            "type": "integer",
+            "description": "Duration in seconds after which the issued secret ID expires.",
+            "format": "seconds"
+          },
+          "token_bound_cidrs": {
+            "type": "array",
+            "description": "List of CIDR blocks. If set, specifies the blocks of IP addresses which can use the returned token. Should be a subset of the token CIDR blocks listed on the role, if any.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "RoleSecretIdBoundCidrsRequest": {
+        "type": "object",
+        "properties": {
+          "secret_id_bound_cidrs": {
+            "type": "array",
+            "description": "Comma separated string or list of CIDR blocks. If set, specifies the blocks of IP addresses which can perform the login operation.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "RoleSecretIdBoundCidrsResponse": {
+        "type": "object",
+        "properties": {
+          "secret_id_bound_cidrs": {
+            "type": "array",
+            "description": "Comma separated string or list of CIDR blocks. If set, specifies the blocks of IP addresses which can perform the login operation.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "RoleSecretIdDestroyRequest": {
+        "type": "object",
+        "properties": {
+          "secret_id": {
+            "type": "string",
+            "description": "SecretID attached to the role."
+          }
+        }
+      },
+      "RoleSecretIdLookupRequest": {
+        "type": "object",
+        "properties": {
+          "secret_id": {
+            "type": "string",
+            "description": "SecretID attached to the role."
+          }
+        }
+      },
+      "RoleSecretIdLookupResponse": {
+        "type": "object",
+        "properties": {
+          "cidr_list": {
+            "type": "array",
+            "description": "List of CIDR blocks enforcing secret IDs to be used from specific set of IP addresses. If 'bound_cidr_list' is set on the role, then the list of CIDR blocks listed here should be a subset of the CIDR blocks listed on the role.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "creation_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiration_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "last_updated_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "metadata": {
+            "type": "object",
+            "format": "kvpairs"
+          },
+          "secret_id_accessor": {
+            "type": "string",
+            "description": "Accessor of the secret ID"
+          },
+          "secret_id_num_uses": {
+            "type": "integer",
+            "description": "Number of times a secret ID can access the role, after which the secret ID will expire."
+          },
+          "secret_id_ttl": {
+            "type": "integer",
+            "description": "Duration in seconds after which the issued secret ID expires.",
+            "format": "seconds"
+          },
+          "token_bound_cidrs": {
+            "type": "array",
+            "description": "List of CIDR blocks. If set, specifies the blocks of IP addresses which can use the returned token. Should be a subset of the token CIDR blocks listed on the role, if any.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "RoleSecretIdNumUsesRequest": {
+        "type": "object",
+        "properties": {
+          "secret_id_num_uses": {
+            "type": "integer",
+            "description": "Number of times a SecretID can access the role, after which the SecretID will expire."
+          }
+        }
+      },
+      "RoleSecretIdNumUsesResponse": {
+        "type": "object",
+        "properties": {
+          "secret_id_num_uses": {
+            "type": "integer",
+            "description": "Number of times a secret ID can access the role, after which the SecretID will expire. Defaults to 0 meaning that the secret ID is of unlimited use."
+          }
+        }
+      },
+      "RoleSecretIdRequest": {
+        "type": "object",
+        "properties": {
+          "cidr_list": {
+            "type": "array",
+            "description": "Comma separated string or list of CIDR blocks enforcing secret IDs to be used from specific set of IP addresses. If 'bound_cidr_list' is set on the role, then the list of CIDR blocks listed here should be a subset of the CIDR blocks listed on the role.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "metadata": {
+            "type": "string",
+            "description": "Metadata to be tied to the SecretID. This should be a JSON formatted string containing the metadata in key value pairs."
+          },
+          "num_uses": {
+            "type": "integer",
+            "description": "Number of times this SecretID can be used, after which the SecretID expires. Overrides secret_id_num_uses role option when supplied. May not be higher than role's secret_id_num_uses."
+          },
+          "token_bound_cidrs": {
+            "type": "array",
+            "description": "Comma separated string or JSON list of CIDR blocks. If set, specifies the blocks of IP addresses which are allowed to use the generated token.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "ttl": {
+            "type": "integer",
+            "description": "Duration in seconds after which this SecretID expires. Overrides secret_id_ttl role option when supplied. May not be longer than role's secret_id_ttl.",
+            "format": "seconds"
+          }
+        }
+      },
+      "RoleSecretIdResponse": {
+        "type": "object",
+        "properties": {
+          "keys": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "RoleSecretIdTtlRequest": {
+        "type": "object",
+        "properties": {
+          "secret_id_ttl": {
+            "type": "integer",
+            "description": "Duration in seconds after which the issued SecretID should expire. Defaults to 0, meaning no expiration.",
+            "format": "seconds"
+          }
+        }
+      },
+      "RoleSecretIdTtlResponse": {
+        "type": "object",
+        "properties": {
+          "secret_id_ttl": {
+            "type": "integer",
+            "description": "Duration in seconds after which the issued secret ID should expire. Defaults to 0, meaning no expiration.",
+            "format": "seconds"
+          }
+        }
+      },
+      "RoleTokenBoundCidrsRequest": {
+        "type": "object",
+        "properties": {
+          "token_bound_cidrs": {
+            "type": "array",
+            "description": "Comma separated string or JSON list of CIDR blocks. If set, specifies the blocks of IP addresses which are allowed to use the generated token.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "RoleTokenBoundCidrsResponse": {
+        "type": "object",
+        "properties": {
+          "token_bound_cidrs": {
+            "type": "array",
+            "description": "Comma separated string or list of CIDR blocks. If set, specifies the blocks of IP addresses which can use the returned token. Should be a subset of the token CIDR blocks listed on the role, if any.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "RoleTokenMaxTtlRequest": {
+        "type": "object",
+        "properties": {
+          "token_max_ttl": {
+            "type": "integer",
+            "description": "The maximum lifetime of the generated token",
+            "format": "seconds"
+          }
+        }
+      },
+      "RoleTokenMaxTtlResponse": {
+        "type": "object",
+        "properties": {
+          "token_max_ttl": {
+            "type": "integer",
+            "description": "The maximum lifetime of the generated token",
+            "format": "seconds"
+          }
+        }
+      },
+      "RoleTokenNumUsesRequest": {
+        "type": "object",
+        "properties": {
+          "token_num_uses": {
+            "type": "integer",
+            "description": "The maximum number of times a token may be used, a value of zero means unlimited"
+          }
+        }
+      },
+      "RoleTokenNumUsesResponse": {
+        "type": "object",
+        "properties": {
+          "token_num_uses": {
+            "type": "integer",
+            "description": "The maximum number of times a token may be used, a value of zero means unlimited"
+          }
+        }
+      },
+      "RoleTokenTtlRequest": {
+        "type": "object",
+        "properties": {
+          "token_ttl": {
+            "type": "integer",
+            "description": "The initial ttl of the token to generate",
+            "format": "seconds"
+          }
+        }
+      },
+      "RoleTokenTtlResponse": {
+        "type": "object",
+        "properties": {
+          "token_ttl": {
+            "type": "integer",
+            "description": "The initial ttl of the token to generate",
+            "format": "seconds"
+          }
+        }
+      }
+    }
+  }
+}

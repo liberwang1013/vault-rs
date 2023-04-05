@@ -1,0 +1,524 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "HashiCorp Vault API",
+    "description": "HTTP API that gives you full access to Vault. All API routes are prefixed with `/v1/`.",
+    "version": "1.13.0",
+    "license": {
+      "name": "Mozilla Public License 2.0",
+      "url": "https://www.mozilla.org/en-US/MPL/2.0"
+    }
+  },
+  "paths": {
+    "/config": {
+      "description": "Provide Vault with the CA certificate used to issue all client certificates.",
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "empty body"
+          }
+        }
+      }
+    },
+    "/login": {
+      "description": "Authenticates an entity with Vault.",
+      "x-vault-unauthenticated": true,
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/roles": {
+      "description": "List the existing roles in this backend.",
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "parameters": [
+          {
+            "name": "list",
+            "description": "Must be set to `true`",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true"
+              ]
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/roles/{role}": {
+      "description": "Read, write and reference policies and roles that tokens can be made for.",
+      "parameters": [
+        {
+          "name": "role",
+          "description": "The name of the role.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "x-vault-createSupported": true,
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RolesRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "empty body"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ConfigRequest": {
+        "type": "object",
+        "properties": {
+          "cf_api_addr": {
+            "type": "string",
+            "description": "CF’s API address.",
+            "x-vault-displayAttrs": {
+              "name": "CF API Address",
+              "value": "https://api.10.244.0.34.xip.io"
+            }
+          },
+          "cf_api_mutual_tls_certificate": {
+            "type": "string",
+            "description": "The PEM-format certificates that are presented for mutual TLS with the CloudFoundry API. If not set, mutual TLS is not used",
+            "x-vault-displayAttrs": {
+              "name": "CF API Mutual TLS Certificate",
+              "value": "-----BEGIN CERTIFICATE----- ... -----END CERTIFICATE-----"
+            }
+          },
+          "cf_api_mutual_tls_key": {
+            "type": "string",
+            "description": "The PEM-format private key that are used for mutual TLS with the CloudFoundry API. If not set, mutual TLS is not used",
+            "x-vault-displayAttrs": {
+              "name": "CF API Mutual TLS Key",
+              "value": "-----BEGIN RSA PRIVATE KEY----- ... -----END RSA PRIVATE KEY-----"
+            }
+          },
+          "cf_api_trusted_certificates": {
+            "type": "array",
+            "description": "The PEM-format CA certificates that are acceptable for the CF API to present.",
+            "items": {
+              "type": "string"
+            },
+            "x-vault-displayAttrs": {
+              "name": "CF API Trusted IdentityCACertificates",
+              "value": "-----BEGIN CERTIFICATE----- ... -----END CERTIFICATE-----"
+            }
+          },
+          "cf_client_id": {
+            "type": "string",
+            "description": "The client id for CF’s API.",
+            "x-vault-displayAttrs": {
+              "name": "CF API Client ID",
+              "value": "client"
+            }
+          },
+          "cf_client_secret": {
+            "type": "string",
+            "description": "The client secret for CF’s API.",
+            "x-vault-displayAttrs": {
+              "name": "CF API Client Secret",
+              "sensitive": true
+            }
+          },
+          "cf_password": {
+            "type": "string",
+            "description": "The password for CF’s API.",
+            "x-vault-displayAttrs": {
+              "name": "CF API Password",
+              "sensitive": true
+            }
+          },
+          "cf_username": {
+            "type": "string",
+            "description": "The username for CF’s API.",
+            "x-vault-displayAttrs": {
+              "name": "CF API Username",
+              "value": "admin"
+            }
+          },
+          "identity_ca_certificates": {
+            "type": "array",
+            "description": "The PEM-format CA certificates that are required to have issued the instance certificates presented for logging in.",
+            "items": {
+              "type": "string"
+            },
+            "x-vault-displayAttrs": {
+              "name": "Identity CA Certificates",
+              "value": "-----BEGIN CERTIFICATE----- ... -----END CERTIFICATE-----"
+            }
+          },
+          "login_max_seconds_not_after": {
+            "type": "integer",
+            "description": "Duration in seconds for the maximum acceptable length in the future a \"signing_time\" can be. Useful for clock drift. Set low to reduce the opportunity for replay attacks.",
+            "default": 60,
+            "x-vault-displayAttrs": {
+              "name": "Login Max Seconds Ahead",
+              "value": "60"
+            }
+          },
+          "login_max_seconds_not_before": {
+            "type": "integer",
+            "description": "Duration in seconds for the maximum acceptable age of a \"signing_time\". Useful for clock drift. Set low to reduce the opportunity for replay attacks.",
+            "format": "seconds",
+            "default": 300,
+            "x-vault-displayAttrs": {
+              "name": "Login Max Seconds Old",
+              "value": "300"
+            }
+          },
+          "pcf_api_addr": {
+            "type": "string",
+            "description": "Deprecated. Please use \"cf_api_addr\".",
+            "deprecated": true,
+            "x-vault-displayAttrs": {
+              "name": "CF API Address",
+              "value": "https://api.10.244.0.34.xip.io"
+            }
+          },
+          "pcf_api_trusted_certificates": {
+            "type": "array",
+            "description": "Deprecated. Please use \"cf_api_trusted_certificates\".",
+            "items": {
+              "type": "string"
+            },
+            "deprecated": true,
+            "x-vault-displayAttrs": {
+              "name": "CF API Trusted IdentityCACertificates",
+              "value": "-----BEGIN CERTIFICATE----- ... -----END CERTIFICATE-----"
+            }
+          },
+          "pcf_password": {
+            "type": "string",
+            "description": "Deprecated. Please use \"cf_password\".",
+            "deprecated": true,
+            "x-vault-displayAttrs": {
+              "name": "CF API Password",
+              "sensitive": true
+            }
+          },
+          "pcf_username": {
+            "type": "string",
+            "description": "Deprecated. Please use \"cf_username\".",
+            "deprecated": true,
+            "x-vault-displayAttrs": {
+              "name": "CF API Username",
+              "value": "admin"
+            }
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "cf_instance_cert": {
+            "type": "string",
+            "description": "The full body of the file available at the CF_INSTANCE_CERT path on the CF instance.",
+            "x-vault-displayAttrs": {
+              "name": "CF_INSTANCE_CERT Contents"
+            }
+          },
+          "role": {
+            "type": "string",
+            "description": "The name of the role to authenticate against.",
+            "x-vault-displayAttrs": {
+              "name": "Role Name",
+              "value": "internally-defined-role"
+            }
+          },
+          "signature": {
+            "type": "string",
+            "description": "The signature generated by the client certificate's private key.",
+            "x-vault-displayAttrs": {
+              "name": "Signature"
+            }
+          },
+          "signing_time": {
+            "type": "string",
+            "description": "The date and time used to construct the signature.",
+            "x-vault-displayAttrs": {
+              "name": "Signing Time",
+              "value": "2006-01-02T15:04:05Z"
+            }
+          }
+        },
+        "required": [
+          "role",
+          "cf_instance_cert",
+          "signing_time",
+          "signature"
+        ]
+      },
+      "RolesRequest": {
+        "type": "object",
+        "properties": {
+          "bound_application_ids": {
+            "type": "array",
+            "description": "Require that the client certificate presented has at least one of these app IDs.",
+            "items": {
+              "type": "string"
+            },
+            "x-vault-displayAttrs": {
+              "name": "Bound Application IDs",
+              "value": "6b814521-5f08-4b1a-8c4e-fbe7c5f3a169"
+            }
+          },
+          "bound_cidrs": {
+            "type": "array",
+            "description": "Use \"token_bound_cidrs\" instead. If this and \"token_bound_cidrs\" are both specified, only \"token_bound_cidrs\" will be used.",
+            "items": {
+              "type": "string"
+            },
+            "deprecated": true
+          },
+          "bound_instance_ids": {
+            "type": "array",
+            "description": "Require that the client certificate presented has at least one of these instance IDs.",
+            "items": {
+              "type": "string"
+            },
+            "x-vault-displayAttrs": {
+              "name": "Bound Instance IDs",
+              "value": "8a886b31-ccf7-480d-54d8-cc28"
+            }
+          },
+          "bound_organization_ids": {
+            "type": "array",
+            "description": "Require that the client certificate presented has at least one of these org IDs.",
+            "items": {
+              "type": "string"
+            },
+            "x-vault-displayAttrs": {
+              "name": "Bound Organization IDs",
+              "value": "34a878d0-c2f9-4521-ba73-a9f664e82c7b"
+            }
+          },
+          "bound_space_ids": {
+            "type": "array",
+            "description": "Require that the client certificate presented has at least one of these space IDs.",
+            "items": {
+              "type": "string"
+            },
+            "x-vault-displayAttrs": {
+              "name": "Bound Space IDs",
+              "value": "3d2eba6b-ef19-44d5-91dd-1975b0db5cc9"
+            }
+          },
+          "disable_ip_matching": {
+            "type": "boolean",
+            "description": "If set to true, disables the default behavior that logging in must be performed from an acceptable IP address described by the certificate presented.",
+            "default": false,
+            "x-vault-displayAttrs": {
+              "name": "Disable IP Address Matching",
+              "value": "false"
+            }
+          },
+          "max_ttl": {
+            "type": "integer",
+            "description": "Use \"token_max_ttl\" instead. If this and \"token_max_ttl\" are both specified, only \"token_max_ttl\" will be used.",
+            "format": "seconds",
+            "deprecated": true
+          },
+          "period": {
+            "type": "integer",
+            "description": "Use \"token_period\" instead. If this and \"token_period\" are both specified, only \"token_period\" will be used.",
+            "format": "seconds",
+            "deprecated": true
+          },
+          "policies": {
+            "type": "array",
+            "description": "Use \"token_policies\" instead. If this and \"token_policies\" are both specified, only \"token_policies\" will be used.",
+            "items": {
+              "type": "string"
+            },
+            "deprecated": true
+          },
+          "token_bound_cidrs": {
+            "type": "array",
+            "description": "Comma separated string or JSON list of CIDR blocks. If set, specifies the blocks of IP addresses which are allowed to use the generated token.",
+            "items": {
+              "type": "string"
+            },
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Bound CIDRs",
+              "group": "Tokens"
+            }
+          },
+          "token_explicit_max_ttl": {
+            "type": "integer",
+            "description": "If set, tokens created via this role carry an explicit maximum TTL. During renewal, the current maximum TTL values of the role and the mount are not checked for changes, and any updates to these values will have no effect on the token being renewed.",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Explicit Maximum TTL",
+              "group": "Tokens"
+            }
+          },
+          "token_max_ttl": {
+            "type": "integer",
+            "description": "The maximum lifetime of the generated token",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Maximum TTL",
+              "group": "Tokens"
+            }
+          },
+          "token_no_default_policy": {
+            "type": "boolean",
+            "description": "If true, the 'default' policy will not automatically be added to generated tokens",
+            "x-vault-displayAttrs": {
+              "name": "Do Not Attach 'default' Policy To Generated Tokens",
+              "group": "Tokens"
+            }
+          },
+          "token_num_uses": {
+            "type": "integer",
+            "description": "The maximum number of times a token may be used, a value of zero means unlimited",
+            "x-vault-displayAttrs": {
+              "name": "Maximum Uses of Generated Tokens",
+              "group": "Tokens"
+            }
+          },
+          "token_period": {
+            "type": "integer",
+            "description": "If set, tokens created via this role will have no max lifetime; instead, their renewal period will be fixed to this value. This takes an integer number of seconds, or a string duration (e.g. \"24h\").",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Period",
+              "group": "Tokens"
+            }
+          },
+          "token_policies": {
+            "type": "array",
+            "description": "Comma-separated list of policies",
+            "items": {
+              "type": "string"
+            },
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Policies",
+              "group": "Tokens"
+            }
+          },
+          "token_ttl": {
+            "type": "integer",
+            "description": "The initial ttl of the token to generate",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Initial TTL",
+              "group": "Tokens"
+            }
+          },
+          "token_type": {
+            "type": "string",
+            "description": "The type of token to generate, service or batch",
+            "default": "default-service",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Type",
+              "group": "Tokens"
+            }
+          },
+          "ttl": {
+            "type": "integer",
+            "description": "Use \"token_ttl\" instead. If this and \"token_ttl\" are both specified, only \"token_ttl\" will be used.",
+            "format": "seconds",
+            "deprecated": true
+          }
+        }
+      }
+    }
+  }
+}

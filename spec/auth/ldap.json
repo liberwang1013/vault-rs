@@ -1,0 +1,593 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "HashiCorp Vault API",
+    "description": "HTTP API that gives you full access to Vault. All API routes are prefixed with `/v1/`.",
+    "version": "1.13.0",
+    "license": {
+      "name": "Mozilla Public License 2.0",
+      "url": "https://www.mozilla.org/en-US/MPL/2.0"
+    }
+  },
+  "paths": {
+    "/config": {
+      "description": "Configure the LDAP server to connect to, along with its options.",
+      "x-vault-displayAttrs": {
+        "action": "Configure"
+      },
+      "get": {
+        "summary": "Configure the LDAP server to connect to, along with its options.",
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "summary": "Configure the LDAP server to connect to, along with its options.",
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/groups": {
+      "description": "Manage additional groups for users allowed to authenticate.",
+      "x-vault-displayAttrs": {
+        "navigation": true,
+        "itemType": "Group"
+      },
+      "get": {
+        "summary": "Manage additional groups for users allowed to authenticate.",
+        "tags": [
+          "auth"
+        ],
+        "parameters": [
+          {
+            "name": "list",
+            "description": "Must be set to `true`",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true"
+              ]
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/groups/{name}": {
+      "description": "Manage additional groups for users allowed to authenticate.",
+      "parameters": [
+        {
+          "name": "name",
+          "description": "Name of the LDAP group.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "x-vault-displayAttrs": {
+        "itemType": "Group",
+        "action": "Create"
+      },
+      "get": {
+        "summary": "Manage additional groups for users allowed to authenticate.",
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "summary": "Manage additional groups for users allowed to authenticate.",
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Manage additional groups for users allowed to authenticate.",
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "empty body"
+          }
+        }
+      }
+    },
+    "/login/{username}": {
+      "description": "Log in with a username and password.",
+      "parameters": [
+        {
+          "name": "username",
+          "description": "DN (distinguished name) to be used for login.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "x-vault-unauthenticated": true,
+      "post": {
+        "summary": "Log in with a username and password.",
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/users": {
+      "description": "Manage users allowed to authenticate.",
+      "x-vault-displayAttrs": {
+        "navigation": true,
+        "itemType": "User"
+      },
+      "get": {
+        "summary": "Manage users allowed to authenticate.",
+        "tags": [
+          "auth"
+        ],
+        "parameters": [
+          {
+            "name": "list",
+            "description": "Must be set to `true`",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true"
+              ]
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/users/{name}": {
+      "description": "Manage users allowed to authenticate.",
+      "parameters": [
+        {
+          "name": "name",
+          "description": "Name of the LDAP user.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "x-vault-displayAttrs": {
+        "itemType": "User",
+        "action": "Create"
+      },
+      "get": {
+        "summary": "Manage users allowed to authenticate.",
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "summary": "Manage users allowed to authenticate.",
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsersRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Manage users allowed to authenticate.",
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "empty body"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ConfigRequest": {
+        "type": "object",
+        "properties": {
+          "anonymous_group_search": {
+            "type": "boolean",
+            "description": "Use anonymous binds when performing LDAP group searches (if true the initial credentials will still be used for the initial connection test).",
+            "default": false,
+            "x-vault-displayAttrs": {
+              "name": "Anonymous group search"
+            }
+          },
+          "binddn": {
+            "type": "string",
+            "description": "LDAP DN for searching for the user DN (optional)",
+            "x-vault-displayAttrs": {
+              "name": "Name of Object to bind (binddn)"
+            }
+          },
+          "bindpass": {
+            "type": "string",
+            "description": "LDAP password for searching for the user DN (optional)",
+            "x-vault-displayAttrs": {
+              "sensitive": true
+            }
+          },
+          "case_sensitive_names": {
+            "type": "boolean",
+            "description": "If true, case sensitivity will be used when comparing usernames and groups for matching policies."
+          },
+          "certificate": {
+            "type": "string",
+            "description": "CA certificate to use when verifying LDAP server certificate, must be x509 PEM encoded (optional)",
+            "x-vault-displayAttrs": {
+              "name": "CA certificate",
+              "editType": "file"
+            }
+          },
+          "client_tls_cert": {
+            "type": "string",
+            "description": "Client certificate to provide to the LDAP server, must be x509 PEM encoded (optional)",
+            "x-vault-displayAttrs": {
+              "name": "Client certificate",
+              "editType": "file"
+            }
+          },
+          "client_tls_key": {
+            "type": "string",
+            "description": "Client certificate key to provide to the LDAP server, must be x509 PEM encoded (optional)",
+            "x-vault-displayAttrs": {
+              "name": "Client key",
+              "editType": "file"
+            }
+          },
+          "deny_null_bind": {
+            "type": "boolean",
+            "description": "Denies an unauthenticated LDAP bind request if the user's password is empty; defaults to true",
+            "default": true
+          },
+          "discoverdn": {
+            "type": "boolean",
+            "description": "Use anonymous bind to discover the bind DN of a user (optional)",
+            "x-vault-displayAttrs": {
+              "name": "Discover DN"
+            }
+          },
+          "groupattr": {
+            "type": "string",
+            "description": "LDAP attribute to follow on objects returned by <groupfilter> in order to enumerate user group membership. Examples: \"cn\" or \"memberOf\", etc. Default: cn",
+            "default": "cn",
+            "x-vault-displayAttrs": {
+              "name": "Group Attribute",
+              "value": "cn"
+            }
+          },
+          "groupdn": {
+            "type": "string",
+            "description": "LDAP search base to use for group membership search (eg: ou=Groups,dc=example,dc=org)",
+            "x-vault-displayAttrs": {
+              "name": "Group DN"
+            }
+          },
+          "groupfilter": {
+            "type": "string",
+            "description": "Go template for querying group membership of user (optional) The template can access the following context variables: UserDN, Username Example: (&(objectClass=group)(member:1.2.840.113556.1.4.1941:={{.UserDN}})) Default: (|(memberUid={{.Username}})(member={{.UserDN}})(uniqueMember={{.UserDN}}))",
+            "default": "(|(memberUid={{.Username}})(member={{.UserDN}})(uniqueMember={{.UserDN}}))",
+            "x-vault-displayAttrs": {
+              "name": "Group Filter"
+            }
+          },
+          "insecure_tls": {
+            "type": "boolean",
+            "description": "Skip LDAP server SSL Certificate verification - VERY insecure (optional)",
+            "x-vault-displayAttrs": {
+              "name": "Insecure TLS"
+            }
+          },
+          "request_timeout": {
+            "type": "integer",
+            "description": "Timeout, in seconds, for the connection when making requests against the server before returning back an error.",
+            "format": "seconds",
+            "default": "90s"
+          },
+          "starttls": {
+            "type": "boolean",
+            "description": "Issue a StartTLS command after establishing unencrypted connection (optional)",
+            "x-vault-displayAttrs": {
+              "name": "Issue StartTLS"
+            }
+          },
+          "tls_max_version": {
+            "type": "string",
+            "description": "Maximum TLS version to use. Accepted values are 'tls10', 'tls11', 'tls12' or 'tls13'. Defaults to 'tls12'",
+            "enum": [
+              "tls10",
+              "tls11",
+              "tls12",
+              "tls13"
+            ],
+            "default": "tls12",
+            "x-vault-displayAttrs": {
+              "name": "Maximum TLS Version"
+            }
+          },
+          "tls_min_version": {
+            "type": "string",
+            "description": "Minimum TLS version to use. Accepted values are 'tls10', 'tls11', 'tls12' or 'tls13'. Defaults to 'tls12'",
+            "enum": [
+              "tls10",
+              "tls11",
+              "tls12",
+              "tls13"
+            ],
+            "default": "tls12",
+            "x-vault-displayAttrs": {
+              "name": "Minimum TLS Version"
+            }
+          },
+          "token_bound_cidrs": {
+            "type": "array",
+            "description": "Comma separated string or JSON list of CIDR blocks. If set, specifies the blocks of IP addresses which are allowed to use the generated token.",
+            "items": {
+              "type": "string"
+            },
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Bound CIDRs",
+              "group": "Tokens"
+            }
+          },
+          "token_explicit_max_ttl": {
+            "type": "integer",
+            "description": "If set, tokens created via this role carry an explicit maximum TTL. During renewal, the current maximum TTL values of the role and the mount are not checked for changes, and any updates to these values will have no effect on the token being renewed.",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Explicit Maximum TTL",
+              "group": "Tokens"
+            }
+          },
+          "token_max_ttl": {
+            "type": "integer",
+            "description": "The maximum lifetime of the generated token",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Maximum TTL",
+              "group": "Tokens"
+            }
+          },
+          "token_no_default_policy": {
+            "type": "boolean",
+            "description": "If true, the 'default' policy will not automatically be added to generated tokens",
+            "x-vault-displayAttrs": {
+              "name": "Do Not Attach 'default' Policy To Generated Tokens",
+              "group": "Tokens"
+            }
+          },
+          "token_num_uses": {
+            "type": "integer",
+            "description": "The maximum number of times a token may be used, a value of zero means unlimited",
+            "x-vault-displayAttrs": {
+              "name": "Maximum Uses of Generated Tokens",
+              "group": "Tokens"
+            }
+          },
+          "token_period": {
+            "type": "integer",
+            "description": "If set, tokens created via this role will have no max lifetime; instead, their renewal period will be fixed to this value. This takes an integer number of seconds, or a string duration (e.g. \"24h\").",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Period",
+              "group": "Tokens"
+            }
+          },
+          "token_policies": {
+            "type": "array",
+            "description": "Comma-separated list of policies. This will apply to all tokens generated by this auth method, in addition to any configured for specific users/groups.",
+            "items": {
+              "type": "string"
+            },
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Policies",
+              "group": "Tokens"
+            }
+          },
+          "token_ttl": {
+            "type": "integer",
+            "description": "The initial ttl of the token to generate",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Initial TTL",
+              "group": "Tokens"
+            }
+          },
+          "token_type": {
+            "type": "string",
+            "description": "The type of token to generate, service or batch",
+            "default": "default-service",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Type",
+              "group": "Tokens"
+            }
+          },
+          "upndomain": {
+            "type": "string",
+            "description": "Enables userPrincipalDomain login with [username]@UPNDomain (optional)",
+            "x-vault-displayAttrs": {
+              "name": "User Principal (UPN) Domain"
+            }
+          },
+          "url": {
+            "type": "string",
+            "description": "LDAP URL to connect to (default: ldap://127.0.0.1). Multiple URLs can be specified by concatenating them with commas; they will be tried in-order.",
+            "default": "ldap://127.0.0.1",
+            "x-vault-displayAttrs": {
+              "name": "URL"
+            }
+          },
+          "use_pre111_group_cn_behavior": {
+            "type": "boolean",
+            "description": "In Vault 1.1.1 a fix for handling group CN values of different cases unfortunately introduced a regression that could cause previously defined groups to not be found due to a change in the resulting name. If set true, the pre-1.1.1 behavior for matching group CNs will be used. This is only needed in some upgrade scenarios for backwards compatibility. It is enabled by default if the config is upgraded but disabled by default on new configurations."
+          },
+          "use_token_groups": {
+            "type": "boolean",
+            "description": "If true, use the Active Directory tokenGroups constructed attribute of the user to find the group memberships. This will find all security groups including nested ones.",
+            "default": false
+          },
+          "userattr": {
+            "type": "string",
+            "description": "Attribute used for users (default: cn)",
+            "default": "cn",
+            "x-vault-displayAttrs": {
+              "name": "User Attribute",
+              "value": "cn"
+            }
+          },
+          "userdn": {
+            "type": "string",
+            "description": "LDAP domain to use for users (eg: ou=People,dc=example,dc=org)",
+            "x-vault-displayAttrs": {
+              "name": "User DN"
+            }
+          },
+          "userfilter": {
+            "type": "string",
+            "description": "Go template for LDAP user search filer (optional) The template can access the following context variables: UserAttr, Username Default: ({{.UserAttr}}={{.Username}})",
+            "default": "({{.UserAttr}}={{.Username}})",
+            "x-vault-displayAttrs": {
+              "name": "User Search Filter"
+            }
+          },
+          "username_as_alias": {
+            "type": "boolean",
+            "description": "If true, sets the alias name to the username",
+            "default": false
+          }
+        }
+      },
+      "GroupsRequest": {
+        "type": "object",
+        "properties": {
+          "policies": {
+            "type": "array",
+            "description": "Comma-separated list of policies associated to the group.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "password": {
+            "type": "string",
+            "description": "Password for this user."
+          }
+        }
+      },
+      "UsersRequest": {
+        "type": "object",
+        "properties": {
+          "groups": {
+            "type": "array",
+            "description": "Comma-separated list of additional groups associated with the user.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "policies": {
+            "type": "array",
+            "description": "Comma-separated list of policies associated with the user.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

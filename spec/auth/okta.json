@@ -1,0 +1,498 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "HashiCorp Vault API",
+    "description": "HTTP API that gives you full access to Vault. All API routes are prefixed with `/v1/`.",
+    "version": "1.13.0",
+    "license": {
+      "name": "Mozilla Public License 2.0",
+      "url": "https://www.mozilla.org/en-US/MPL/2.0"
+    }
+  },
+  "paths": {
+    "/config": {
+      "description": "This endpoint allows you to configure the Okta and its configuration options. The Okta organization are the characters at the front of the URL for Okta. Example https://ORG.okta.com",
+      "x-vault-createSupported": true,
+      "x-vault-displayAttrs": {
+        "action": "Configure"
+      },
+      "get": {
+        "summary": "This endpoint allows you to configure the Okta and its\nconfiguration options.\n\nThe Okta organization are the characters at the front of the URL for Okta.\nExample https://ORG.okta.com",
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "summary": "This endpoint allows you to configure the Okta and its\nconfiguration options.\n\nThe Okta organization are the characters at the front of the URL for Okta.\nExample https://ORG.okta.com",
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/groups": {
+      "description": "Manage users allowed to authenticate.",
+      "x-vault-displayAttrs": {
+        "navigation": true,
+        "itemType": "Group"
+      },
+      "get": {
+        "summary": "Manage users allowed to authenticate.",
+        "tags": [
+          "auth"
+        ],
+        "parameters": [
+          {
+            "name": "list",
+            "description": "Must be set to `true`",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true"
+              ]
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/groups/{name}": {
+      "description": "Manage users allowed to authenticate.",
+      "parameters": [
+        {
+          "name": "name",
+          "description": "Name of the Okta group.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "x-vault-displayAttrs": {
+        "itemType": "Group",
+        "action": "Create"
+      },
+      "get": {
+        "summary": "Manage users allowed to authenticate.",
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "summary": "Manage users allowed to authenticate.",
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Manage users allowed to authenticate.",
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "empty body"
+          }
+        }
+      }
+    },
+    "/login/{username}": {
+      "description": "Log in with a username and password.",
+      "parameters": [
+        {
+          "name": "username",
+          "description": "Username to be used for login.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "x-vault-unauthenticated": true,
+      "post": {
+        "summary": "Log in with a username and password.",
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/users": {
+      "description": "Manage additional groups for users allowed to authenticate.",
+      "x-vault-displayAttrs": {
+        "navigation": true,
+        "itemType": "User"
+      },
+      "get": {
+        "summary": "Manage additional groups for users allowed to authenticate.",
+        "tags": [
+          "auth"
+        ],
+        "parameters": [
+          {
+            "name": "list",
+            "description": "Must be set to `true`",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true"
+              ]
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/users/{name}": {
+      "description": "Manage additional groups for users allowed to authenticate.",
+      "parameters": [
+        {
+          "name": "name",
+          "description": "Name of the user.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "x-vault-displayAttrs": {
+        "itemType": "User",
+        "action": "Create"
+      },
+      "get": {
+        "summary": "Manage additional groups for users allowed to authenticate.",
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "summary": "Manage additional groups for users allowed to authenticate.",
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsersRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Manage additional groups for users allowed to authenticate.",
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "empty body"
+          }
+        }
+      }
+    },
+    "/verify/{nonce}": {
+      "parameters": [
+        {
+          "name": "nonce",
+          "description": "Nonce provided during a login request to retrieve the number verification challenge for the matching request.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "x-vault-unauthenticated": true,
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ConfigRequest": {
+        "type": "object",
+        "properties": {
+          "api_token": {
+            "type": "string",
+            "description": "Okta API key.",
+            "x-vault-displayAttrs": {
+              "name": "API Token"
+            }
+          },
+          "base_url": {
+            "type": "string",
+            "description": "The base domain to use for the Okta API. When not specified in the configuration, \"okta.com\" is used.",
+            "x-vault-displayAttrs": {
+              "name": "Base URL"
+            }
+          },
+          "bypass_okta_mfa": {
+            "type": "boolean",
+            "description": "When set true, requests by Okta for a MFA check will be bypassed. This also disallows certain status checks on the account, such as whether the password is expired.",
+            "x-vault-displayAttrs": {
+              "name": "Bypass Okta MFA"
+            }
+          },
+          "max_ttl": {
+            "type": "integer",
+            "description": "Use \"token_max_ttl\" instead. If this and \"token_max_ttl\" are both specified, only \"token_max_ttl\" will be used.",
+            "format": "seconds",
+            "deprecated": true
+          },
+          "org_name": {
+            "type": "string",
+            "description": "Name of the organization to be used in the Okta API.",
+            "x-vault-displayAttrs": {
+              "name": "Organization Name"
+            }
+          },
+          "organization": {
+            "type": "string",
+            "description": "Use org_name instead.",
+            "deprecated": true
+          },
+          "production": {
+            "type": "boolean",
+            "description": "Use base_url instead.",
+            "deprecated": true
+          },
+          "token": {
+            "type": "string",
+            "description": "Use api_token instead.",
+            "deprecated": true
+          },
+          "token_bound_cidrs": {
+            "type": "array",
+            "description": "Comma separated string or JSON list of CIDR blocks. If set, specifies the blocks of IP addresses which are allowed to use the generated token.",
+            "items": {
+              "type": "string"
+            },
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Bound CIDRs",
+              "group": "Tokens"
+            }
+          },
+          "token_explicit_max_ttl": {
+            "type": "integer",
+            "description": "If set, tokens created via this role carry an explicit maximum TTL. During renewal, the current maximum TTL values of the role and the mount are not checked for changes, and any updates to these values will have no effect on the token being renewed.",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Explicit Maximum TTL",
+              "group": "Tokens"
+            }
+          },
+          "token_max_ttl": {
+            "type": "integer",
+            "description": "The maximum lifetime of the generated token",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Maximum TTL",
+              "group": "Tokens"
+            }
+          },
+          "token_no_default_policy": {
+            "type": "boolean",
+            "description": "If true, the 'default' policy will not automatically be added to generated tokens",
+            "x-vault-displayAttrs": {
+              "name": "Do Not Attach 'default' Policy To Generated Tokens",
+              "group": "Tokens"
+            }
+          },
+          "token_num_uses": {
+            "type": "integer",
+            "description": "The maximum number of times a token may be used, a value of zero means unlimited",
+            "x-vault-displayAttrs": {
+              "name": "Maximum Uses of Generated Tokens",
+              "group": "Tokens"
+            }
+          },
+          "token_period": {
+            "type": "integer",
+            "description": "If set, tokens created via this role will have no max lifetime; instead, their renewal period will be fixed to this value. This takes an integer number of seconds, or a string duration (e.g. \"24h\").",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Period",
+              "group": "Tokens"
+            }
+          },
+          "token_policies": {
+            "type": "array",
+            "description": "Comma-separated list of policies. This will apply to all tokens generated by this auth method, in addition to any configured for specific users/groups.",
+            "items": {
+              "type": "string"
+            },
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Policies",
+              "group": "Tokens"
+            }
+          },
+          "token_ttl": {
+            "type": "integer",
+            "description": "The initial ttl of the token to generate",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Initial TTL",
+              "group": "Tokens"
+            }
+          },
+          "token_type": {
+            "type": "string",
+            "description": "The type of token to generate, service or batch",
+            "default": "default-service",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Type",
+              "group": "Tokens"
+            }
+          },
+          "ttl": {
+            "type": "integer",
+            "description": "Use \"token_ttl\" instead. If this and \"token_ttl\" are both specified, only \"token_ttl\" will be used.",
+            "format": "seconds",
+            "deprecated": true
+          }
+        }
+      },
+      "GroupsRequest": {
+        "type": "object",
+        "properties": {
+          "policies": {
+            "type": "array",
+            "description": "Comma-separated list of policies associated to the group.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "nonce": {
+            "type": "string",
+            "description": "Nonce provided if performing login that requires number verification challenge. Logins through the vault login CLI command will automatically generate a nonce."
+          },
+          "password": {
+            "type": "string",
+            "description": "Password for this user."
+          },
+          "provider": {
+            "type": "string",
+            "description": "Preferred factor provider."
+          },
+          "totp": {
+            "type": "string",
+            "description": "TOTP passcode."
+          }
+        }
+      },
+      "UsersRequest": {
+        "type": "object",
+        "properties": {
+          "groups": {
+            "type": "array",
+            "description": "List of groups associated with the user.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "policies": {
+            "type": "array",
+            "description": "List of policies associated with the user.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

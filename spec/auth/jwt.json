@@ -1,0 +1,567 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "HashiCorp Vault API",
+    "description": "HTTP API that gives you full access to Vault. All API routes are prefixed with `/v1/`.",
+    "version": "1.13.0",
+    "license": {
+      "name": "Mozilla Public License 2.0",
+      "url": "https://www.mozilla.org/en-US/MPL/2.0"
+    }
+  },
+  "paths": {
+    "/config": {
+      "description": "Configures the JWT authentication backend.",
+      "get": {
+        "summary": "Read the current JWT authentication backend configuration.",
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "summary": "Configure the JWT authentication backend.",
+        "description": "The JWT authentication backend validates JWTs (or OIDC) using the configured\ncredentials. If using OIDC Discovery, the URL must be provided, along\nwith (optionally) the CA cert to use for the connection. If performing JWT\nvalidation locally, a set of public keys must be provided.",
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/login": {
+      "description": "Authenticates to Vault using a JWT (or OIDC) token.",
+      "x-vault-unauthenticated": true,
+      "post": {
+        "summary": "Authenticates to Vault using a JWT (or OIDC) token.",
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/oidc/auth_url": {
+      "x-vault-unauthenticated": true,
+      "post": {
+        "summary": "Request an authorization URL to start an OIDC login flow.",
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OidcAuthUrlRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/oidc/callback": {
+      "x-vault-unauthenticated": true,
+      "get": {
+        "summary": "Callback endpoint to complete an OIDC login.",
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "summary": "Callback endpoint to handle form_posts.",
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OidcCallbackRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/role": {
+      "description": "Lists all the roles registered with the backend.",
+      "get": {
+        "summary": "Lists all the roles registered with the backend.",
+        "description": "The list will contain the names of the roles.",
+        "tags": [
+          "auth"
+        ],
+        "parameters": [
+          {
+            "name": "list",
+            "description": "Must be set to `true`",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true"
+              ]
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/role/{name}": {
+      "description": "Register an role with the backend.",
+      "parameters": [
+        {
+          "name": "name",
+          "description": "Name of the role.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "x-vault-createSupported": true,
+      "get": {
+        "summary": "Read an existing role.",
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "summary": "Register an role with the backend.",
+        "description": "A role is required to authenticate with this backend. The role binds\n\t\tJWT token information with token policies and settings.\n\t\tThe bindings, token polices and token settings can all be configured\n\t\tusing this endpoint",
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an existing role.",
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "empty body"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ConfigRequest": {
+        "type": "object",
+        "properties": {
+          "bound_issuer": {
+            "type": "string",
+            "description": "The value against which to match the 'iss' claim in a JWT. Optional."
+          },
+          "default_role": {
+            "type": "string",
+            "description": "The default role to use if none is provided during login. If not set, a role is required during login.",
+            "format": "lowercase"
+          },
+          "jwks_ca_pem": {
+            "type": "string",
+            "description": "The CA certificate or chain of certificates, in PEM format, to use to validate connections to the JWKS URL. If not set, system certificates are used."
+          },
+          "jwks_url": {
+            "type": "string",
+            "description": "JWKS URL to use to authenticate signatures. Cannot be used with \"oidc_discovery_url\" or \"jwt_validation_pubkeys\"."
+          },
+          "jwt_supported_algs": {
+            "type": "array",
+            "description": "A list of supported signing algorithms. Defaults to RS256.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "jwt_validation_pubkeys": {
+            "type": "array",
+            "description": "A list of PEM-encoded public keys to use to authenticate signatures locally. Cannot be used with \"jwks_url\" or \"oidc_discovery_url\".",
+            "items": {
+              "type": "string"
+            }
+          },
+          "namespace_in_state": {
+            "type": "boolean",
+            "description": "Pass namespace in the OIDC state parameter instead of as a separate query parameter. With this setting, the allowed redirect URL(s) in Vault and on the provider side should not contain a namespace query parameter. This means only one redirect URL entry needs to be maintained on the provider side for all vault namespaces that will be authenticating against it. Defaults to true for new configs.",
+            "x-vault-displayAttrs": {
+              "name": "Namespace in OIDC state",
+              "value": true
+            }
+          },
+          "oidc_client_id": {
+            "type": "string",
+            "description": "The OAuth Client ID configured with your OIDC provider."
+          },
+          "oidc_client_secret": {
+            "type": "string",
+            "description": "The OAuth Client Secret configured with your OIDC provider.",
+            "x-vault-displayAttrs": {
+              "sensitive": true
+            }
+          },
+          "oidc_discovery_ca_pem": {
+            "type": "string",
+            "description": "The CA certificate or chain of certificates, in PEM format, to use to validate connections to the OIDC Discovery URL. If not set, system certificates are used."
+          },
+          "oidc_discovery_url": {
+            "type": "string",
+            "description": "OIDC Discovery URL, without any .well-known component (base path). Cannot be used with \"jwks_url\" or \"jwt_validation_pubkeys\"."
+          },
+          "oidc_response_mode": {
+            "type": "string",
+            "description": "The response mode to be used in the OAuth2 request. Allowed values are 'query' and 'form_post'."
+          },
+          "oidc_response_types": {
+            "type": "array",
+            "description": "The response types to request. Allowed values are 'code' and 'id_token'. Defaults to 'code'.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "provider_config": {
+            "type": "object",
+            "description": "Provider-specific configuration. Optional.",
+            "format": "map",
+            "x-vault-displayAttrs": {
+              "name": "Provider Config"
+            }
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "jwt": {
+            "type": "string",
+            "description": "The signed JWT to validate."
+          },
+          "role": {
+            "type": "string",
+            "description": "The role to log in against.",
+            "format": "lowercase"
+          }
+        }
+      },
+      "OidcAuthUrlRequest": {
+        "type": "object",
+        "properties": {
+          "client_nonce": {
+            "type": "string",
+            "description": "Optional client-provided nonce that must match during callback, if present."
+          },
+          "redirect_uri": {
+            "type": "string",
+            "description": "The OAuth redirect_uri to use in the authorization URL."
+          },
+          "role": {
+            "type": "string",
+            "description": "The role to issue an OIDC authorization URL against.",
+            "format": "lowercase"
+          }
+        }
+      },
+      "OidcCallbackRequest": {
+        "type": "object",
+        "properties": {
+          "client_nonce": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "id_token": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        }
+      },
+      "RoleRequest": {
+        "type": "object",
+        "properties": {
+          "allowed_redirect_uris": {
+            "type": "array",
+            "description": "Comma-separated list of allowed values for redirect_uri",
+            "items": {
+              "type": "string"
+            }
+          },
+          "bound_audiences": {
+            "type": "array",
+            "description": "Comma-separated list of 'aud' claims that are valid for login; any match is sufficient",
+            "items": {
+              "type": "string"
+            }
+          },
+          "bound_cidrs": {
+            "type": "array",
+            "description": "Use \"token_bound_cidrs\" instead. If this and \"token_bound_cidrs\" are both specified, only \"token_bound_cidrs\" will be used.",
+            "items": {
+              "type": "string"
+            },
+            "deprecated": true
+          },
+          "bound_claims": {
+            "type": "object",
+            "description": "Map of claims/values which must match for login",
+            "format": "map"
+          },
+          "bound_claims_type": {
+            "type": "string",
+            "description": "How to interpret values in the map of claims/values (which must match for login): allowed values are 'string' or 'glob'",
+            "default": "string"
+          },
+          "bound_subject": {
+            "type": "string",
+            "description": "The 'sub' claim that is valid for login. Optional."
+          },
+          "claim_mappings": {
+            "type": "object",
+            "description": "Mappings of claims (key) that will be copied to a metadata field (value)",
+            "format": "kvpairs"
+          },
+          "clock_skew_leeway": {
+            "type": "integer",
+            "description": "Duration in seconds of leeway when validating all claims to account for clock skew. Defaults to 60 (1 minute) if set to 0 and can be disabled if set to -1.",
+            "format": "seconds",
+            "default": 60000000000
+          },
+          "expiration_leeway": {
+            "type": "integer",
+            "description": "Duration in seconds of leeway when validating expiration of a token to account for clock skew. Defaults to 150 (2.5 minutes) if set to 0 and can be disabled if set to -1.",
+            "format": "seconds",
+            "default": 150
+          },
+          "groups_claim": {
+            "type": "string",
+            "description": "The claim to use for the Identity group alias names"
+          },
+          "max_age": {
+            "type": "integer",
+            "description": "Specifies the allowable elapsed time in seconds since the last time the user was actively authenticated.",
+            "format": "seconds"
+          },
+          "max_ttl": {
+            "type": "integer",
+            "description": "Use \"token_max_ttl\" instead. If this and \"token_max_ttl\" are both specified, only \"token_max_ttl\" will be used.",
+            "format": "seconds",
+            "deprecated": true
+          },
+          "not_before_leeway": {
+            "type": "integer",
+            "description": "Duration in seconds of leeway when validating not before values of a token to account for clock skew. Defaults to 150 (2.5 minutes) if set to 0 and can be disabled if set to -1.",
+            "format": "seconds",
+            "default": 150
+          },
+          "num_uses": {
+            "type": "integer",
+            "description": "Use \"token_num_uses\" instead. If this and \"token_num_uses\" are both specified, only \"token_num_uses\" will be used.",
+            "deprecated": true
+          },
+          "oidc_scopes": {
+            "type": "array",
+            "description": "Comma-separated list of OIDC scopes",
+            "items": {
+              "type": "string"
+            }
+          },
+          "period": {
+            "type": "integer",
+            "description": "Use \"token_period\" instead. If this and \"token_period\" are both specified, only \"token_period\" will be used.",
+            "format": "seconds",
+            "deprecated": true
+          },
+          "policies": {
+            "type": "array",
+            "description": "Use \"token_policies\" instead. If this and \"token_policies\" are both specified, only \"token_policies\" will be used.",
+            "items": {
+              "type": "string"
+            },
+            "deprecated": true
+          },
+          "role_type": {
+            "type": "string",
+            "description": "Type of the role, either 'jwt' or 'oidc'."
+          },
+          "token_bound_cidrs": {
+            "type": "array",
+            "description": "Comma separated string or JSON list of CIDR blocks. If set, specifies the blocks of IP addresses which are allowed to use the generated token.",
+            "items": {
+              "type": "string"
+            },
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Bound CIDRs",
+              "group": "Tokens"
+            }
+          },
+          "token_explicit_max_ttl": {
+            "type": "integer",
+            "description": "If set, tokens created via this role carry an explicit maximum TTL. During renewal, the current maximum TTL values of the role and the mount are not checked for changes, and any updates to these values will have no effect on the token being renewed.",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Explicit Maximum TTL",
+              "group": "Tokens"
+            }
+          },
+          "token_max_ttl": {
+            "type": "integer",
+            "description": "The maximum lifetime of the generated token",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Maximum TTL",
+              "group": "Tokens"
+            }
+          },
+          "token_no_default_policy": {
+            "type": "boolean",
+            "description": "If true, the 'default' policy will not automatically be added to generated tokens",
+            "x-vault-displayAttrs": {
+              "name": "Do Not Attach 'default' Policy To Generated Tokens",
+              "group": "Tokens"
+            }
+          },
+          "token_num_uses": {
+            "type": "integer",
+            "description": "The maximum number of times a token may be used, a value of zero means unlimited",
+            "x-vault-displayAttrs": {
+              "name": "Maximum Uses of Generated Tokens",
+              "group": "Tokens"
+            }
+          },
+          "token_period": {
+            "type": "integer",
+            "description": "If set, tokens created via this role will have no max lifetime; instead, their renewal period will be fixed to this value. This takes an integer number of seconds, or a string duration (e.g. \"24h\").",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Period",
+              "group": "Tokens"
+            }
+          },
+          "token_policies": {
+            "type": "array",
+            "description": "Comma-separated list of policies",
+            "items": {
+              "type": "string"
+            },
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Policies",
+              "group": "Tokens"
+            }
+          },
+          "token_ttl": {
+            "type": "integer",
+            "description": "The initial ttl of the token to generate",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Initial TTL",
+              "group": "Tokens"
+            }
+          },
+          "token_type": {
+            "type": "string",
+            "description": "The type of token to generate, service or batch",
+            "default": "default-service",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Type",
+              "group": "Tokens"
+            }
+          },
+          "ttl": {
+            "type": "integer",
+            "description": "Use \"token_ttl\" instead. If this and \"token_ttl\" are both specified, only \"token_ttl\" will be used.",
+            "format": "seconds",
+            "deprecated": true
+          },
+          "user_claim": {
+            "type": "string",
+            "description": "The claim to use for the Identity entity alias name"
+          },
+          "user_claim_json_pointer": {
+            "type": "boolean",
+            "description": "If true, the user_claim value will use JSON pointer syntax for referencing claims."
+          },
+          "verbose_oidc_logging": {
+            "type": "boolean",
+            "description": "Log received OIDC tokens and claims when debug-level logging is active. Not recommended in production since sensitive information may be present in OIDC responses."
+          }
+        }
+      }
+    }
+  }
+}

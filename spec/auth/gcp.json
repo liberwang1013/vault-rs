@@ -1,0 +1,571 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "HashiCorp Vault API",
+    "description": "HTTP API that gives you full access to Vault. All API routes are prefixed with `/v1/`.",
+    "version": "1.13.0",
+    "license": {
+      "name": "Mozilla Public License 2.0",
+      "url": "https://www.mozilla.org/en-US/MPL/2.0"
+    }
+  },
+  "paths": {
+    "/config": {
+      "description": "Configure credentials used to query the GCP IAM API to verify authenticating service accounts",
+      "get": {
+        "summary": "Configure credentials used to query the GCP IAM API to verify authenticating service accounts",
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "summary": "Configure credentials used to query the GCP IAM API to verify authenticating service accounts",
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/login": {
+      "description": "Authenticates Google Cloud Platform entities with Vault.",
+      "x-vault-unauthenticated": true,
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/role": {
+      "description": "Lists all the roles that are registered with Vault.",
+      "get": {
+        "summary": "Lists all the roles that are registered with Vault.",
+        "tags": [
+          "auth"
+        ],
+        "parameters": [
+          {
+            "name": "list",
+            "description": "Must be set to `true`",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true"
+              ]
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/role/{name}": {
+      "description": "Create a GCP role with associated policies and required attributes.",
+      "parameters": [
+        {
+          "name": "name",
+          "description": "Name of the role.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "x-vault-createSupported": true,
+      "get": {
+        "summary": "Create a GCP role with associated policies and required attributes.",
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a GCP role with associated policies and required attributes.",
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Create a GCP role with associated policies and required attributes.",
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "empty body"
+          }
+        }
+      }
+    },
+    "/role/{name}/labels": {
+      "description": "Add or remove labels for an existing 'gce' role",
+      "parameters": [
+        {
+          "name": "name",
+          "description": "Name of the role.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "Add or remove labels for an existing 'gce' role",
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleLabelsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/role/{name}/service-accounts": {
+      "description": "Add or remove service accounts for an existing `iam` role",
+      "parameters": [
+        {
+          "name": "name",
+          "description": "Name of the role.",
+          "in": "path",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "Add or remove service accounts for an existing `iam` role",
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleServiceAccountsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/roles": {
+      "description": "Lists all the roles that are registered with Vault.",
+      "get": {
+        "summary": "Lists all the roles that are registered with Vault.",
+        "tags": [
+          "auth"
+        ],
+        "parameters": [
+          {
+            "name": "list",
+            "description": "Must be set to `true`",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true"
+              ]
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ConfigRequest": {
+        "type": "object",
+        "properties": {
+          "credentials": {
+            "type": "string",
+            "description": "Google credentials JSON that Vault will use to verify users against GCP APIs. If not specified, will use application default credentials",
+            "x-vault-displayAttrs": {
+              "name": "Credentials"
+            }
+          },
+          "custom_endpoint": {
+            "type": "object",
+            "description": "Specifies overrides for various Google API Service Endpoints used in requests.",
+            "format": "kvpairs"
+          },
+          "gce_alias": {
+            "type": "string",
+            "description": "Indicates what value to use when generating an alias for GCE authentications.",
+            "default": "role_id"
+          },
+          "gce_metadata": {
+            "type": "array",
+            "description": "The metadata to include on the aliases and audit logs generated by this plugin. When set to 'default', includes: instance_creation_timestamp, instance_id, instance_name, project_id, project_number, role, service_account_id, service_account_email, zone. Not editing this field means the 'default' fields are included. Explicitly setting this field to empty overrides the 'default' and means no metadata will be included. If not using 'default', explicit fields must be sent like: 'field1,field2'.",
+            "items": {
+              "type": "string"
+            },
+            "default": [
+              "default"
+            ],
+            "x-vault-displayAttrs": {
+              "name": "gce_metadata",
+              "value": "field1,field2"
+            }
+          },
+          "google_certs_endpoint": {
+            "type": "string",
+            "description": "Deprecated. This field does nothing and be removed in a future release",
+            "deprecated": true
+          },
+          "iam_alias": {
+            "type": "string",
+            "description": "Indicates what value to use when generating an alias for IAM authentications.",
+            "default": "role_id"
+          },
+          "iam_metadata": {
+            "type": "array",
+            "description": "The metadata to include on the aliases and audit logs generated by this plugin. When set to 'default', includes: project_id, role, service_account_id, service_account_email. Not editing this field means the 'default' fields are included. Explicitly setting this field to empty overrides the 'default' and means no metadata will be included. If not using 'default', explicit fields must be sent like: 'field1,field2'.",
+            "items": {
+              "type": "string"
+            },
+            "default": [
+              "default"
+            ],
+            "x-vault-displayAttrs": {
+              "name": "iam_metadata",
+              "value": "field1,field2"
+            }
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "jwt": {
+            "type": "string",
+            "description": "A signed JWT. This is either a self-signed service account JWT ('iam' roles only) or a GCE identity metadata token ('iam', 'gce' roles)."
+          },
+          "role": {
+            "type": "string",
+            "description": "Name of the role against which the login is being attempted. Required."
+          }
+        }
+      },
+      "RoleLabelsRequest": {
+        "type": "object",
+        "properties": {
+          "add": {
+            "type": "array",
+            "description": "BoundLabels to add (in $key:$value)",
+            "items": {
+              "type": "string"
+            }
+          },
+          "remove": {
+            "type": "array",
+            "description": "Label key values to remove",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "RoleRequest": {
+        "type": "object",
+        "properties": {
+          "add_group_aliases": {
+            "type": "boolean",
+            "description": "If true, will add group aliases to auth tokens generated under this role. This will add the full list of ancestors (projects, folders, organizations) for the given entity's project. Requires IAM permission `resourcemanager.projects.get` on this project.",
+            "default": false
+          },
+          "allow_gce_inference": {
+            "type": "boolean",
+            "description": "'iam' roles only. If false, Vault will not not allow GCE instances to login in against this role",
+            "default": true
+          },
+          "bound_instance_group": {
+            "type": "string",
+            "description": "Deprecated: use \"bound_instance_groups\" instead."
+          },
+          "bound_instance_groups": {
+            "type": "array",
+            "description": "Comma-separated list of permitted instance groups to which the GCE instance must belong. This option only applies to \"gce\" roles.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "bound_labels": {
+            "type": "array",
+            "description": "Comma-separated list of GCP labels formatted as\"key:value\" strings that must be present on the GCE instance in order to authenticate. This option only applies to \"gce\" roles.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "bound_projects": {
+            "type": "array",
+            "description": "GCP Projects that authenticating entities must belong to.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "bound_region": {
+            "type": "string",
+            "description": "Deprecated: use \"bound_regions\" instead."
+          },
+          "bound_regions": {
+            "type": "array",
+            "description": "Comma-separated list of permitted regions to which the GCE instance must belong. If a group is provided, it is assumed to be a regional group. If \"zone\" is provided, this option is ignored. This can be a self-link or region name. This option only applies to \"gce\" roles.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "bound_service_accounts": {
+            "type": "array",
+            "description": "Can be set for both 'iam' and 'gce' roles (required for 'iam'). A comma-seperated list of authorized service accounts. If the single value \"*\" is given, this is assumed to be all service accounts under the role's project. If this is set on a GCE role, the inferred service account from the instance metadata token will be used.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "bound_zone": {
+            "type": "string",
+            "description": "Deprecated: use \"bound_zones\" instead."
+          },
+          "bound_zones": {
+            "type": "array",
+            "description": "Comma-separated list of permitted zones to which the GCE instance must belong. If a group is provided, it is assumed to be a zonal group. This can be a self-link or zone name. This option only applies to \"gce\" roles.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "max_jwt_exp": {
+            "type": "integer",
+            "description": "Currently enabled for 'iam' only. Duration in seconds from time of validation that a JWT must expire within.",
+            "format": "seconds",
+            "default": 900
+          },
+          "max_ttl": {
+            "type": "integer",
+            "description": "Use \"token_max_ttl\" instead. If this and \"token_max_ttl\" are both specified, only \"token_max_ttl\" will be used.",
+            "format": "seconds",
+            "deprecated": true
+          },
+          "period": {
+            "type": "integer",
+            "description": "Use \"token_period\" instead. If this and \"token_period\" are both specified, only \"token_period\" will be used.",
+            "format": "seconds",
+            "deprecated": true
+          },
+          "policies": {
+            "type": "array",
+            "description": "Use \"token_policies\" instead. If this and \"token_policies\" are both specified, only \"token_policies\" will be used.",
+            "items": {
+              "type": "string"
+            },
+            "deprecated": true
+          },
+          "project_id": {
+            "type": "string",
+            "description": "Deprecated: use \"bound_projects\" instead"
+          },
+          "service_accounts": {
+            "type": "array",
+            "description": "Deprecated: use \"bound_service_accounts\" instead.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "token_bound_cidrs": {
+            "type": "array",
+            "description": "Comma separated string or JSON list of CIDR blocks. If set, specifies the blocks of IP addresses which are allowed to use the generated token.",
+            "items": {
+              "type": "string"
+            },
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Bound CIDRs",
+              "group": "Tokens"
+            }
+          },
+          "token_explicit_max_ttl": {
+            "type": "integer",
+            "description": "If set, tokens created via this role carry an explicit maximum TTL. During renewal, the current maximum TTL values of the role and the mount are not checked for changes, and any updates to these values will have no effect on the token being renewed.",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Explicit Maximum TTL",
+              "group": "Tokens"
+            }
+          },
+          "token_max_ttl": {
+            "type": "integer",
+            "description": "The maximum lifetime of the generated token",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Maximum TTL",
+              "group": "Tokens"
+            }
+          },
+          "token_no_default_policy": {
+            "type": "boolean",
+            "description": "If true, the 'default' policy will not automatically be added to generated tokens",
+            "x-vault-displayAttrs": {
+              "name": "Do Not Attach 'default' Policy To Generated Tokens",
+              "group": "Tokens"
+            }
+          },
+          "token_num_uses": {
+            "type": "integer",
+            "description": "The maximum number of times a token may be used, a value of zero means unlimited",
+            "x-vault-displayAttrs": {
+              "name": "Maximum Uses of Generated Tokens",
+              "group": "Tokens"
+            }
+          },
+          "token_period": {
+            "type": "integer",
+            "description": "If set, tokens created via this role will have no max lifetime; instead, their renewal period will be fixed to this value. This takes an integer number of seconds, or a string duration (e.g. \"24h\").",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Period",
+              "group": "Tokens"
+            }
+          },
+          "token_policies": {
+            "type": "array",
+            "description": "Comma-separated list of policies",
+            "items": {
+              "type": "string"
+            },
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Policies",
+              "group": "Tokens"
+            }
+          },
+          "token_ttl": {
+            "type": "integer",
+            "description": "The initial ttl of the token to generate",
+            "format": "seconds",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Initial TTL",
+              "group": "Tokens"
+            }
+          },
+          "token_type": {
+            "type": "string",
+            "description": "The type of token to generate, service or batch",
+            "default": "default-service",
+            "x-vault-displayAttrs": {
+              "name": "Generated Token's Type",
+              "group": "Tokens"
+            }
+          },
+          "ttl": {
+            "type": "integer",
+            "description": "Use \"token_ttl\" instead. If this and \"token_ttl\" are both specified, only \"token_ttl\" will be used.",
+            "format": "seconds",
+            "deprecated": true
+          },
+          "type": {
+            "type": "string",
+            "description": "Type of the role. Currently supported: iam, gce"
+          }
+        }
+      },
+      "RoleServiceAccountsRequest": {
+        "type": "object",
+        "properties": {
+          "add": {
+            "type": "array",
+            "description": "Service-account emails or IDs to add.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "remove": {
+            "type": "array",
+            "description": "Service-account emails or IDs to remove.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}
