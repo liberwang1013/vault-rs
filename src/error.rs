@@ -8,9 +8,9 @@ pub enum Error {
     VarError(String),
     #[error("Missing Vault Token")]
     MissingToken,
-    #[error("failed to decode json")]
+    #[error(transparent)]
     Decode(#[from] serde_json::Error),
-    #[error("failed to build reqwest request")]
+    #[error(transparent)]
     Reqwest(#[from] reqwest::Error),
     #[error("error")]
     Status,
