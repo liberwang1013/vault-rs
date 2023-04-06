@@ -57,7 +57,6 @@ impl Client {
         default_header.insert(VAULT_TOKEN_HEADER, token.parse().unwrap());
 
         let client = reqwest::Client::builder()
-            .pool_max_idle_per_host(0)
             .default_headers(default_header)
             .build()?;
 
