@@ -1,6 +1,6 @@
 [package]
 name = "vault"
-version = "0.0.3"
+version = "0.0.4"
 authors = ["Liber Wang <liberwang1013@gmail.com>"]
 edition = "2021"
 
@@ -11,7 +11,7 @@ path = "src/lib.rs"
 
 
 [build-dependencies]
-openapi-struct-gen = {git = "https://github.com/liberwang1013/openapi-struct-gen.git", features = ["build"]}
+openapi-struct-gen = {git = "https://github.com/liberwang1013/openapi-struct-gen.git", tag="v0.1.12", features = ["build"]}
 
 
 [dependencies]
