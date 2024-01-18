@@ -11,7 +11,7 @@ path = "src/lib.rs"
 
 
 [build-dependencies]
-openapi-struct-gen = {git = "https://github.com/liberwang1013/openapi-struct-gen.git", tag="v0.1.12", features = ["build"]}
+openapi-struct-gen = {git = "https://github.com/liberwang1013/openapi-struct-gen.git", tag="v0.1.13", features = ["build"]}
 
 
 [dependencies]
