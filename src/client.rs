@@ -100,6 +100,7 @@ impl Client {
         let req = self
             .http_client
             .request(Method::PATCH, format!("{}/{}", self.endpoint, key))
+            .header("Content-Type", "application/merge-patch+json")
             .json(&data)
             .build()?;
         self.execute(req).await
