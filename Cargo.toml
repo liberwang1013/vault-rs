@@ -8,12 +8,6 @@ edition = "2021"
 name = "vault"
 path = "src/lib.rs"
 
-
-
-[build-dependencies]
-openapi-struct-gen = {git = "https://github.com/liberwang1013/openapi-struct-gen.git", tag="v0.1.12", features = ["build"]}
-
-
 [dependencies]
 tracing = "0.1"
 thiserror = "1.0"
