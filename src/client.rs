@@ -92,6 +92,20 @@ impl Client {
     }
 
     #[allow(dead_code)]
+    pub async fn patch<T: Serialize, R: DeserializeOwned>(
+        &self,
+        key: &str,
+        data: T,
+    ) -> Result<Secret<R>> {
+        let req = self
+            .http_client
+            .request(Method::PATCH, format!("{}/{}", self.endpoint, key))
+            .json(&data)
+            .build()?;
+        self.execute(req).await
+    }
+
+    #[allow(dead_code)]
     pub async fn put<T: Serialize, R: DeserializeOwned>(
         &self,
         key: &str,
